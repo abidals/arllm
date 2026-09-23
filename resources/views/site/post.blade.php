@@ -62,7 +62,7 @@
         @endif
     </article>
 
-    {{{{-- زر تحرير سريع للمخوّلين --}}
+    {{-- زر تحرير سريع للمخوّلين --}}
     @auth
         @can('update', $post)
             <a href="{{ route('admin.posts.edit', $post) }}"
