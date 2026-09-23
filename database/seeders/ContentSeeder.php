@@ -17,7 +17,7 @@ class ContentSeeder extends Seeder
         $admin = User::create([
             'name' => 'admin',
             'display_name' => 'رئيس التحرير',
-            'email' => 'admin@madar.test',
+            'email' => 'admin@example.com',
             'password' => Hash::make('Pass@12345'),
             'bio' => 'يشرف على الغرفة الإخبارية ويراجع كل إصدارات الموقع.',
         ]);
@@ -26,7 +26,7 @@ class ContentSeeder extends Seeder
         $editor = User::create([
             'name' => 'editor',
             'display_name' => 'سلمى المحررة',
-            'email' => 'editor@madar.test',
+            'email' => 'editor@example.com',
             'password' => Hash::make('Pass@12345'),
             'bio' => 'محررة اقتصاد وتقنية، مسؤولة عن مراجعة الصفحة الأولى.',
         ]);
@@ -35,7 +35,7 @@ class ContentSeeder extends Seeder
         $author = User::create([
             'name' => 'author',
             'display_name' => 'يارا الكاتبة',
-            'email' => 'author@madar.test',
+            'email' => 'author@example.com',
             'password' => Hash::make('Pass@12345'),
             'bio' => 'كاتبة مستقلة تتابع ملفات الثقافة والمجتمع.',
         ]);

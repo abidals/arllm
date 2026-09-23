@@ -37,7 +37,7 @@ class SettingController extends Controller
     {
         return view('admin.settings.edit', [
             'settings' => [
-                'site_name' => Setting::get('site_name', 'مدار'),
+                'site_name' => Setting::get('site_name', 'موقع إخباري'),
                 'site_tagline' => Setting::get('site_tagline', 'صحافة رقمية عربية'),
                 'site_description' => Setting::get('site_description', ''),
                 'sponsored_label' => Setting::get('sponsored_label', 'محتوى إعلاني'),
