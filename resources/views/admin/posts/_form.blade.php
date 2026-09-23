@@ -173,5 +173,7 @@
                 </a>
             </div>
         @endif
+
+        @include('admin.ai._panel', ['context' => 'post'])
     </div>
 </form>

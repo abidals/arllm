@@ -43,6 +43,13 @@
                 <span class="text-sm font-semibold">تمكين التعليقات في الموقع</span>
             </label>
 
+            <label class="flex items-center gap-2 border-t border-gray-200 pt-4">
+                <input type="hidden" name="ai_enabled" value="0">
+                <input type="checkbox" name="ai_enabled" value="1" @checked($settings['ai_enabled'])
+                       class="rounded border-gray-300 text-red-700 focus:ring-red-700">
+                <span class="text-sm font-semibold">تفعيل مساعد الذكاء الاصطناعي للتحرير (المدير والمحرر فقط)</span>
+            </label>
+
             <button class="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-2.5 rounded-lg">
                 حفظ الإعدادات
             </button>

@@ -72,27 +72,9 @@ class Post extends Model
 
     /* ---------------- Markdown pipeline ---------------- */
 
-    private static ?MarkdownConverter $converter = null;
-
-    private static function converter(): MarkdownConverter
-    {
-        if (!self::$converter) {
-            $env = new Environment([
-                'html_input' => 'strip',
-                'allow_unsafe_links' => false,
-            ]);
-            $env->addExtension(new CommonMarkCoreExtension());
-            $env->addExtension(new GithubFlavoredMarkdownExtension());
-            $env->addExtension(new AutolinkExtension());
-            self::$converter = new MarkdownConverter($env);
-        }
-
-        return self::$converter;
-    }
-
     public function renderContent(): void
     {
-        $this->content_html = self::converter()->convert($this->content_md)->getContent();
+        $this->content_html = render_markdown($this->content_md);
         $this->reading_time = max(1, (int) ceil(str_word_count_ar($this->content_md) / 180));
     }
 

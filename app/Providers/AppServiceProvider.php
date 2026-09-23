@@ -31,9 +31,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-users', fn ($user) => $user->hasRole('admin'));
         Gate::define('manage-settings', fn ($user) => $user->hasRole('admin'));
         Gate::define('manage-categories', fn ($user) => $user->hasAnyRole(['admin', 'editor']));
+        Gate::define('manage-ai', fn ($user) => $user->hasRole('admin'));
+        Gate::define('use-ai', fn ($user) => $user->hasAnyRole(['admin', 'editor']));
+        Gate::define('manage-pages', fn ($user) => $user->hasAnyRole(['admin', 'editor']));
 
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(5)->by((string) $request->email.'|'.$request->ip()));
         RateLimiter::for('comments', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('ai', fn (Request $request) => Limit::perMinute(12)->by($request->user()?->id ?: $request->ip()));
     }
 }

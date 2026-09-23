@@ -121,6 +121,9 @@
                     <li><a href="{{ route('site.archives') }}" class="hover:text-white">الأرشيف</a></li>
                     <li><a href="{{ route('site.search') }}" class="hover:text-white">البحث</a></li>
                     <li><a href="{{ route('login') }}" class="hover:text-white">دخول المحررين</a></li>
+                    @foreach (nav_pages() as $navPage)
+                        <li><a href="{{ route('site.page', $navPage['slug']) }}" class="hover:text-white">{{ $navPage['title'] }}</a></li>
+                    @endforeach
                 </ul>
             </div>
         </div>

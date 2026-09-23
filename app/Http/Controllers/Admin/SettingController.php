@@ -17,6 +17,7 @@ class SettingController extends Controller
                 'sponsored_label' => Setting::get('sponsored_label', 'محتوى إعلاني'),
                 'footer_text' => Setting::get('footer_text', ''),
                 'comments_enabled' => Setting::get('comments_enabled', '1') === '1',
+                'ai_enabled' => Setting::get('ai_enabled', '0') === '1',
             ],
         ]);
     }
@@ -29,10 +30,11 @@ class SettingController extends Controller
             'sponsored_label' => ['nullable', 'string', 'max:60'],
             'footer_text' => ['nullable', 'string', 'max:300'],
             'comments_enabled' => ['nullable', 'boolean'],
+            'ai_enabled' => ['nullable', 'boolean'],
         ]);
 
         foreach ($data as $key => $value) {
-            if ($key === 'comments_enabled') {
+            if (in_array($key, ['comments_enabled', 'ai_enabled'], true)) {
                 $value = $value ? '1' : '0';
             }
 

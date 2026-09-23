@@ -52,3 +52,11 @@ if (!function_exists('arabic_date')) {
         return ($date ?? now())->locale('ar')->isoFormat($format);
     }
 }
+
+if (!function_exists('render_markdown')) {
+    /** تحويل Markdown إلى HTML آمن (بدون HTML خام) */
+    function render_markdown(string $markdown): string
+    {
+        return \App\Services\MarkdownRenderer::render($markdown);
+    }
+}

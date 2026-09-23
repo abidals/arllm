@@ -36,6 +36,14 @@
                             الإعدادات
                         </a>
                     @endcan
+                    @can('manage-ai')
+                        <a href="{{ route('admin.ai.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.ai.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800' }}">
+                            مساعد AI
+                        </a>
+                        <a href="{{ route('admin.pages.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.pages.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800' }}">
+                            الصفحات
+                        </a>
+                    @endcan
                 </div>
             </div>
 
@@ -103,6 +111,10 @@
             @endcan
             @can('manage-settings')
                 <a href="{{ route('admin.settings.edit') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('admin.settings.*') ? 'bg-gray-800 text-white' : 'text-gray-300' }}">الإعدادات</a>
+            @endcan
+            @can('manage-ai')
+                <a href="{{ route('admin.ai.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('admin.ai.*') ? 'bg-gray-800 text-white' : 'text-gray-300' }}">مساعد AI</a>
+                <a href="{{ route('admin.pages.index') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('admin.pages.*') ? 'bg-gray-800 text-white' : 'text-gray-300' }}">الصفحات</a>
             @endcan
         </div>
 

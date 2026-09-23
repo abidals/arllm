@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\PostCommentController;
@@ -23,6 +26,7 @@ Route::get('/archives', [SiteController::class, 'archives'])->name('site.archive
 Route::get('section/{category:slug}', [SiteController::class, 'category'])->name('site.category');
 Route::get('author/{author}', [SiteController::class, 'author'])->name('site.author');
 Route::get('p/{post:slug}', [SiteController::class, 'post'])->name('site.post');
+Route::get('page/{page:slug}', [PageController::class, 'show'])->name('site.page');
 
 Route::post('p/{post:slug}/comments', [PostCommentController::class, 'store'])
     ->middleware('throttle:comments')
@@ -63,6 +67,27 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
         Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
         Route::post('posts/{post}/unpublish', [PostController::class, 'unpublish'])->name('posts.unpublish');
         Route::post('posts/import-md', [PostController::class, 'importMarkdown'])->name('posts.import-md');
+
+        // صفحات ثابتة (من نحن، الخصوصية…)
+        Route::middleware('can:manage-pages')->group(function () {
+            Route::get('pages', [AdminPageController::class, 'index'])->name('pages.index');
+            Route::post('pages', [AdminPageController::class, 'store'])->name('pages.store');
+            Route::put('pages/{page}', [AdminPageController::class, 'update'])->name('pages.update');
+            Route::delete('pages/{page}', [AdminPageController::class, 'destroy'])->name('pages.destroy');
+        });
+
+        // مساعد الذكاء الاصطناعي — بوابة خاصة للتحرير
+        Route::middleware('can:manage-ai')->group(function () {
+            Route::get('ai', [AiController::class, 'index'])->name('ai.index');
+            Route::post('ai/providers', [AiController::class, 'store'])->name('ai.providers.store');
+            Route::put('ai/providers/{provider}', [AiController::class, 'update'])->name('ai.providers.update');
+            Route::delete('ai/providers/{provider}', [AiController::class, 'destroy'])->name('ai.providers.destroy');
+            Route::post('ai/providers/{provider}/default', [AiController::class, 'makeDefault'])->name('ai.providers.default');
+        });
+
+        Route::post('ai/generate', [AiController::class, 'generate'])
+            ->middleware('can:use-ai')
+            ->name('ai.generate');
 
         // الأقسام
         Route::middleware('can:manage-categories')->group(function () {

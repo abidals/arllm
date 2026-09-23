@@ -1,11 +1,17 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BfEsM0WR.css",
+    "file": "assets/app-BbHCk9A9.css",
     "name": "app",
     "names": [
       "app.css"
     ],
     "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/ai-admin.js": {
+    "file": "assets/ai-admin-ChUhfv74.js",
+    "name": "ai-admin",
+    "src": "resources/js/ai-admin.js",
     "isEntry": true
   },
   "resources/js/app.js": {
