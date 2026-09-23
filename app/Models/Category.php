@@ -49,5 +49,6 @@ class Category extends Model
     {
         Cache::forget('site.sections');
         Cache::forget('site.sections.v2');
+        Cache::forget('site.sections.v3');
     }
 }

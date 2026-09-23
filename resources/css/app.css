@@ -115,6 +115,44 @@ body {
     background: var(--color-brand-200, #fecaca);
 }
 
+/* ==================== قائمة الأقسام (Menu / Sub Menu) ==================== */
+
+.site-nav .nav-top {
+    @apply relative pb-2;
+}
+
+.site-nav .nav-top > .nav-sub {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 180px;
+    z-index: 50;
+    @apply bg-white rounded-lg shadow-xl border border-gray-100 py-2;
+}
+
+/* للقسم الأول: الصائمة تفتح لليسار حتى لا تخرج من الشاشة */
+.site-nav .nav-top:first-child > .nav-sub {
+    right: auto;
+    left: 0;
+}
+
+.site-nav .nav-top:hover > .nav-sub,
+.site-nav .nav-top:focus-within > .nav-sub,
+.site-nav .nav-top.is-active > .nav-sub {
+    display: block;
+}
+
+/* شريط أخف حركة عند فتح القائمة */
+.site-nav .nav-top:hover > .nav-sub {
+    animation: submenu-in 120ms ease-out;
+}
+
+@keyframes submenu-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* ==================== شريط الأخبار العاجلة ==================== */
 
 .ticker {

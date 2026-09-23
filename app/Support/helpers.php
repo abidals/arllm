@@ -24,18 +24,26 @@ if (!function_exists('format_bytes')) {
 }
 
 if (!function_exists('site_sections')) {
-    /** أقسام الموقع الرئيسية فقط (الأبناء تصبح داخل صفحة القسم) */
+    /** القائمة: أقسام رئيسية + أبناؤها (Menu / Sub Menu) */
     function site_sections(): array
     {
         try {
-            $data = Cache::rememberForever('site.sections.v2', function () {
+            $data = Cache::rememberForever('site.sections.v3', function () {
                 return \App\Models\Category::query()
-                    ->where('is_active', true)
                     ->whereNull('parent_id')
+                    ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')])
+                    ->where('is_active', true)
                     ->orderBy('sort_order')
                     ->limit(12)
-                    ->get(['name', 'slug'])
-                    ->map(fn ($c) => ['name' => $c->name, 'slug' => $c->slug])
+                    ->get()
+                    ->map(fn ($c) => [
+                        'name' => $c->name,
+                        'slug' => $c->slug,
+                        'has_children' => $c->children->isNotEmpty(),
+                        'children' => $c->children
+                            ->map(fn ($ch) => ['name' => $ch->name, 'slug' => $ch->slug])
+                            ->all(),
+                    ])
                     ->values()
                     ->all();
             });

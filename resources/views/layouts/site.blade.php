@@ -107,14 +107,36 @@
                 </form>
             </div>
 
-            <nav class="border-t border-gray-100 overflow-x-auto" aria-label="الأقسام">
-                <ul class="flex items-center gap-6 py-2 text-sm font-semibold whitespace-nowrap">
+            <nav class="border-t border-gray-100 overflow-x-auto site-nav" aria-label="الأقسام">
+                <ul class="flex items-start gap-6 py-2 text-sm font-semibold whitespace-nowrap">
                     @foreach (site_sections() as $section)
-                        <li>
+                        @php
+                            $active = request()->is('section/'.$section['slug'])
+                                || collect($section['children'])->contains(fn ($ch) => request()->is('section/'.$ch['slug']));
+                        @endphp
+                        <li class="nav-top {{ $active ? 'is-active' : '' }}">
                             <a href="{{ route('site.category', $section['slug']) }}"
-                               class="hover:text-red-700 {{ request()->is('section/'.$section['slug']) ? 'text-red-700' : '' }}">
+                               class="flex items-center gap-1 hover:text-red-700 {{ $active ? 'text-red-700' : '' }}">
                                 {{ $section['name'] }}
+                                @if ($section['has_children'])
+                                    <svg class="w-3 h-3 mt-0.5 opacity-60" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                @endif
                             </a>
+
+                            @if ($section['has_children'])
+                                <div class="nav-sub" role="menu">
+                                    <a href="{{ route('site.category', $section['slug']) }}" class="block px-4 py-2 text-sm font-bold text-gray-900 hover:bg-red-50 hover:text-red-700" role="menuitem">
+                                        {{ $section['name'] }} — الكل
+                                    </a>
+                                    @foreach ($section['children'] as $child)
+                                        <a href="{{ route('site.category', $child['slug']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700" role="menuitem">
+                                            {{ $child['name'] }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
                         </li>
                     @endforeach
                 </ul>
