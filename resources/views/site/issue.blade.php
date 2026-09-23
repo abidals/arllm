@@ -6,7 +6,7 @@
     <article class="max-w-6xl mx-auto">
         {{-- غلاف العدد --}}
         <header class="text-center border-y-4 border-double border-gray-900 py-10 mb-10 relative">
-            <div class="absolute top-4 right-4 text-[11px] font-bold tracking-wider text-red-700 border border-red-700 px-2 py-1 rounded-full">
+            <div class="absolute top-4 right-4 text-[11px] font-bold tracking-wider text-brand border border-brand px-2 py-1 rounded-full">
                 {{ $day->locale('ar')->isoFormat('dddd') }} · {{ config('app.name') }}
             </div>
             <p class="text-xs tracking-[0.3em] text-gray-500 font-semibold mb-3">إصدار يومي</p>
@@ -44,7 +44,7 @@
             @forelse ($sections as $sectionName => $posts)
                 <section class="grid lg:grid-cols-[220px_1fr] gap-8 border-t border-gray-300 pt-8 first:border-t-0 first:pt-0">
                     <div class="lg:border-l lg:border-gray-300 lg:pl-6">
-                        <h3 class="text-xl font-black border-b-4 border-red-700 inline-block pb-1">{{ $sectionName }}</h3>
+                        <h3 class="text-xl font-black border-b-4 border-brand inline-block pb-1">{{ $sectionName }}</h3>
                         <p class="text-xs text-gray-500 mt-2">{{ $posts->count() }} تحرير</p>
                     </div>
                     <ol class="space-y-5">
@@ -52,7 +52,7 @@
                             <li>
                                 <a href="{{ route('site.post', $post->slug) }}" class="group grid sm:grid-cols-[1fr_auto] gap-2 items-baseline">
                                     <div>
-                                        <h4 class="font-bold text-lg group-hover:text-red-700 transition-colors leading-snug">{{ $post->title }}</h4>
+                                        <h4 class="font-bold text-lg group-hover:text-brand transition-colors leading-snug">{{ $post->title }}</h4>
                                         <p class="text-sm text-gray-600 font-naskh line-clamp-1 mt-1">{{ $post->excerpt }}</p>
                                     </div>
                                     <div class="text-[11px] text-gray-500 whitespace-nowrap sm:text-left">{{ \Illuminate\Support\Str::of($post->content_md ?? '')->wordCount() }} كلمات</div>
@@ -67,7 +67,7 @@
         </div>
 
         <div class="text-center mt-14 pt-8 border-t border-gray-200 text-sm">
-            <a href="{{ route('site.archives') }}" class="text-red-700 font-bold hover:underline">تصفح أرشيف الأعداد ←</a>
+            <a href="{{ route('site.archives') }}" class="text-brand font-bold hover:underline">تصفح أرشيف الأعداد ←</a>
         </div>
     </article>
 @endsection

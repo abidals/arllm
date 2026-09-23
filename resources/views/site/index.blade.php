@@ -18,7 +18,7 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-0 right-0 p-6 sm:p-10 max-w-3xl">
                     @if ($featured->category)
-                        <span class="inline-block bg-red-700 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+                        <span class="inline-block bg-brand text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
                             {{ $featured->category->name }}
                         </span>
                     @endif
@@ -42,8 +42,8 @@
     @if ($featuredStrip->isNotEmpty())
         <section class="mb-10">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold border-b-4 border-red-700 inline-block pb-1">مميزة اليوم</h3>
-                <a href="{{ route('site.issue') }}" class="text-sm font-semibold text-red-700 hover:underline">العدد الكامل ←</a>
+                <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1">مميزة اليوم</h3>
+                <a href="{{ route('site.issue') }}" class="text-sm font-semibold text-brand hover:underline">العدد الكامل ←</a>
             </div>
             <div class="grid sm:grid-cols-3 gap-5">
                 @foreach ($featuredStrip as $post)
@@ -56,7 +56,7 @@
     <div class="grid lg:grid-cols-[1fr_300px] gap-10">
         {{-- التدفق الرئيسي --}}
         <section>
-            <h3 class="text-xl font-bold border-b-4 border-red-700 inline-block pb-1 mb-6">أجدد القصص</h3>
+            <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1 mb-6">أجدد القصص</h3>
             <div class="grid sm:grid-cols-2 gap-6">
                 @forelse ($posts as $post)
                     @include('site.partials.post-card', ['post' => $post, 'showCategory' => true])
@@ -72,7 +72,7 @@
                         <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">
                             {{ \App\Models\Setting::get('sponsored_label', 'محتوى إعلاني') }}
                         </span>
-                        <a href="{{ route('site.post', $sponsored->slug) }}" class="font-bold hover:text-red-700">
+                        <a href="{{ route('site.post', $sponsored->slug) }}" class="font-bold hover:text-brand">
                             {{ $sponsored->title }}
                         </a>
                     </div>
@@ -101,7 +101,7 @@
                 <ul class="space-y-2">
                     @foreach (site_sections() as $section)
                         <li>
-                            <a href="{{ route('site.category', $section['slug']) }}" class="flex justify-between hover:text-red-700">
+                            <a href="{{ route('site.category', $section['slug']) }}" class="flex justify-between hover:text-brand">
                                 <span>{{ $section['name'] }}</span>
                                 <span class="text-gray-400">←</span>
                             </a>

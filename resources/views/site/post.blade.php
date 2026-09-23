@@ -12,7 +12,7 @@
         <header class="border-b border-gray-200 pb-8 mb-8">
             @if ($post->category)
                 <a href="{{ route('site.category', $post->category->slug) }}"
-                   class="text-red-700 font-bold text-sm uppercase tracking-wide hover:underline">
+                   class="text-brand font-bold text-sm uppercase tracking-wide hover:underline">
                     {{ $post->category->name }}
                 </a>
             @endif
@@ -27,7 +27,7 @@
                         <span class="w-9 h-9 rounded-full bg-red-100 text-red-800 flex items-center justify-center font-bold">
                             {{ mb_substr($post->author->approvedName(), 0, 1) }}
                         </span>
-                        <span class="font-semibold text-gray-800 group-hover:text-red-700">{{ $post->author->approvedName() }}</span>
+                        <span class="font-semibold text-gray-800 group-hover:text-brand">{{ $post->author->approvedName() }}</span>
                     </a>
                 @endif
                 <span aria-hidden="true">•</span>
@@ -62,10 +62,23 @@
         @endif
     </article>
 
+    {{{{-- زر تحرير سريع للمخوّلين --}}
+    @auth
+        @can('update', $post)
+            <a href="{{ route('admin.posts.edit', $post) }}"
+               class="fixed bottom-6 left-6 z-40 bg-brand text-white shadow-lg rounded-full px-5 py-3 text-sm font-bold flex items-center gap-2 hover-brand-dark transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                </svg>
+                تعديل المقال
+            </a>
+        @endcan
+    @endauth
+
     {{-- مقالات مرتبطة --}}
     @if ($related->count())
         <section class="max-w-7xl mx-auto mt-16">
-            <h2 class="text-xl font-bold border-b-4 border-red-700 inline-block pb-1 mb-6">مقالات مرتبطة</h2>
+            <h2 class="text-xl font-bold border-b-4 border-brand inline-block pb-1 mb-6">مقالات مرتبطة</h2>
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($related as $r)
                     @include('site.partials.post-card', ['post' => $r, 'showCategory' => true])
@@ -121,7 +134,7 @@
                               placeholder="عبرتك رأيك…"></textarea>
                 </div>
 
-                <button type="submit" class="mt-4 bg-gray-900 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors">
+                <button type="submit" class="mt-4 bg-brand text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors">
                     إرسال التعليق
                 </button>
                 <p class="text-xs text-gray-500 mt-3">ستُنشر التعليقات بعد مراجعة المحرر. ممنوع الإساءة والسب.</p>

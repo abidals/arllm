@@ -30,19 +30,25 @@ class SettingController extends Controller
 
     private const TEXT_KEYS = [
         'site_tagline' => '', 'site_description' => '', 'sponsored_label' => 'محتوى إعلاني',
-        'footer_text' => '', 'ticker_text' => '',
+        'footer_text' => '', 'ticker_text' => '', 'site_name' => '',
     ];
 
     public function edit(): \Illuminate\View\View
     {
         return view('admin.settings.edit', [
             'settings' => [
+                'site_name' => Setting::get('site_name', 'مدار'),
                 'site_tagline' => Setting::get('site_tagline', 'صحافة رقمية عربية'),
                 'site_description' => Setting::get('site_description', ''),
                 'sponsored_label' => Setting::get('sponsored_label', 'محتوى إعلاني'),
                 'footer_text' => Setting::get('footer_text', ''),
                 'comments_enabled' => Setting::get('comments_enabled', '1') === '1',
                 'ai_enabled' => Setting::get('ai_enabled', '0') === '1',
+
+                // الثيم والألوان
+                'brand_color' => Setting::get('brand_color', '#b91c1c'),
+                'dark_color' => Setting::get('dark_color', '#111827'),
+                'menu_position' => Setting::get('menu_position', 'right'),
 
                 // الهوية البصرية
                 'site_logo' => Setting::get('site_logo'),
@@ -71,12 +77,17 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
+            'site_name' => ['nullable', 'string', 'max:60'],
             'site_tagline' => ['nullable', 'string', 'max:150'],
             'site_description' => ['nullable', 'string', 'max:300'],
             'sponsored_label' => ['nullable', 'string', 'max:60'],
             'footer_text' => ['nullable', 'string', 'max:300'],
             'comments_enabled' => ['nullable', 'boolean'],
             'ai_enabled' => ['nullable', 'boolean'],
+
+            'brand_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{3,8}$/'],
+            'dark_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{3,8}$/'],
+            'menu_position' => ['nullable', Rule::in(['right', 'center', 'left'])],
 
             'font_heading_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
             'font_body_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
@@ -107,7 +118,7 @@ class SettingController extends Controller
             }
         }
 
-        foreach (['font_heading_family', 'font_body_family', 'ticker_speed', 'ticker_bg', 'ticker_color', 'featured_strip_count'] as $simple) {
+        foreach (['font_heading_family', 'font_body_family', 'ticker_speed', 'ticker_bg', 'ticker_color', 'featured_strip_count', 'brand_color', 'dark_color', 'menu_position'] as $simple) {
             if (isset($data[$simple])) {
                 Setting::set($simple, (string) $data[$simple]);
             }

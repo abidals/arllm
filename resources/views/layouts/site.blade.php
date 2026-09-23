@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', site_name())</title>
     <meta name="description" content="@yield('meta_description', \Illuminate\Support\Str::limit(\App\Models\Setting::get('site_description', 'صحافة رقمية عربية'), 160))">
     <link rel="canonical" content="@yield('canonical', url()->current())">
     <meta property="og:title" content="@yield('og_title', config('app.name'))">
@@ -17,6 +17,8 @@
         $bodyFamily = \App\Models\Setting::get('font_body_family', 'Noto Naskh Arabic');
         $fontFamilies = array_values(array_unique([$headingFamily, $bodyFamily, 'IBM Plex Sans Arabic', 'Noto Naskh Arabic']));
         $familiesQuery = implode('&family=', array_map(fn ($f) => str_replace(' ', '+', $f).':wght@400;500;600;700', $fontFamilies));
+        $menuPosition = \App\Models\Setting::get('menu_position', 'right');
+        $menuAlign = ['right' => 'justify-start', 'center' => 'justify-center', 'left' => 'justify-end'][$menuPosition] ?? 'justify-start';
     @endphp
 
     @stack('styles')
@@ -30,13 +32,13 @@
         <link rel="icon" href="{{ Storage::url($fav) }}">
     @endif
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/site-nav.js'])
 
-    {{-- تخصيص الخطوط والهوية من الإعدادات (يجب أن تسبق الستايل) --}}
+    {{-- الثيم: الألوان القابلة للتحكم من اللوحة --}}
     <style>
         :root {
-            --font-arabic-headline: '{{ $headingFamily }}', 'Noto Kufi Arabic', sans-serif;
-            --font-arabic-body: '{{ $bodyFamily }}', 'Amiri', serif;
+            --brand: {{ \App\Models\Setting::get('brand_color', '#b91c1c') }};
+            --dark: {{ \App\Models\Setting::get('dark_color', '#111827') }};
         }
         @if ($headingFontPath = \App\Models\Setting::get('heading_font_path'))
             @font-face {
@@ -59,7 +61,7 @@
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
     {{-- الشريط العلوي --}}
-    <div class="bg-gray-900 text-gray-200 text-xs">
+    <div class="bg-theme-dark text-gray-200 text-xs">
         <div class="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
             <span class="hidden sm:block font-medium">{{ now()->locale('ar')->isoFormat('dddd، D MMMM YYYY') }}</span>
             <div class="flex items-center gap-4">
@@ -86,10 +88,10 @@
             <div class="flex items-center justify-between py-3">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     @if ($logo = \App\Models\Setting::get('site_logo'))
-                        <img src="{{ Storage::url($logo) }}" alt="{{ config('app.name') }}" class="h-10 sm:h-12 w-auto object-contain">
+                        <img src="{{ Storage::url($logo) }}" alt="{{ site_name() }}" class="h-10 sm:h-12 w-auto object-contain">
                     @else
                         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-950">
-                            {{ config('app.name') }}
+                            {{ site_name() }}
                         </h1>
                     @endif
                 </a>
@@ -108,7 +110,7 @@
             </div>
 
             <nav class="border-t border-gray-100 overflow-x-auto site-nav" aria-label="الأقسام">
-                <ul class="flex items-start gap-6 py-2 text-sm font-semibold whitespace-nowrap">
+                <ul class="flex {{ $menuAlign }} items-start gap-6 py-2 text-sm font-semibold whitespace-nowrap min-w-max">
                     @foreach (site_sections() as $section)
                         @php
                             $active = request()->is('section/'.$section['slug'])
@@ -116,7 +118,7 @@
                         @endphp
                         <li class="nav-top {{ $active ? 'is-active' : '' }}">
                             <a href="{{ route('site.category', $section['slug']) }}"
-                               class="flex items-center gap-1 hover:text-red-700 {{ $active ? 'text-red-700' : '' }}">
+                               class="flex items-center gap-1 hover:text-brand {{ $active ? 'text-brand' : '' }}">
                                 {{ $section['name'] }}
                                 @if ($section['has_children'])
                                     <svg class="w-3 h-3 mt-0.5 opacity-60" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -127,11 +129,11 @@
 
                             @if ($section['has_children'])
                                 <div class="nav-sub" role="menu">
-                                    <a href="{{ route('site.category', $section['slug']) }}" class="block px-4 py-2 text-sm font-bold text-gray-900 hover:bg-red-50 hover:text-red-700" role="menuitem">
+                                    <a href="{{ route('site.category', $section['slug']) }}" class="block px-4 py-2 text-sm font-bold text-gray-900 hover:bg-red-50 hover:text-brand" role="menuitem">
                                         {{ $section['name'] }} — الكل
                                     </a>
                                     @foreach ($section['children'] as $child)
-                                        <a href="{{ route('site.category', $child['slug']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700" role="menuitem">
+                                        <a href="{{ route('site.category', $child['slug']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-brand" role="menuitem">
                                             {{ $child['name'] }}
                                         </a>
                                     @endforeach
@@ -161,7 +163,7 @@
     </main>
 
     {{-- التذييل --}}
-    <footer class="bg-gray-900 text-gray-300 mt-12">
+    <footer class="bg-theme-dark text-gray-300 mt-12">
         <div class="max-w-7xl mx-auto px-4 py-10 grid gap-8 md:grid-cols-3">
             <div>
                 <h2 class="text-2xl font-bold text-white mb-2">{{ config('app.name') }}</h2>

@@ -56,6 +56,7 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('search', [DashboardController::class, 'search'])->name('search');
 
         // المقالات
         Route::get('posts', [PostController::class, 'index'])->name('posts.index');

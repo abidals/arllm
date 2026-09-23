@@ -61,6 +61,36 @@
                 </div>
             </div>
 
+            {{-- الثيم والألوان --}}
+            <div class="bg-white rounded-xl shadow p-6 space-y-4">
+                <h3 class="font-bold border-b border-gray-200 pb-3">اسم الموقع والألوان (الثيم الكامل)</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1.5">اسم الموقع</label>
+                        <input name="site_name" maxlength="60" value="{{ old('site_name', $settings['site_name']) }}" class="w-full border-gray-300 rounded-lg">
+                        <p class="text-xs text-gray-500 mt-1">يظهر في الرأس والتذييل والعناوين — بدل الاسم الثابت في الكود.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1.5">موقع قائمة الأقسام</label>
+                        <select name="menu_position" class="w-full border-gray-300 rounded-lg bg-white">
+                            @foreach (['right' => 'يمين (افتراضي)', 'center' => 'وسط', 'left' => 'يسار'] as $pos => $label)
+                                <option value="{{ $pos }}" @selected($settings['menu_position'] === $pos)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1.5">اللون الأساسي (هويات الروابط والفواصل)</label>
+                        <input name="brand_color" type="color" value="{{ old('brand_color', $settings['brand_color']) }}" class="w-full h-10 rounded-lg border-gray-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1.5">اللون الداكن (الشريط والتذييل)</label>
+                        <input name="dark_color" type="color" value="{{ old('dark_color', $settings['dark_color']) }}" class="w-full h-10 rounded-lg border-gray-300">
+                    </div>
+                </div>
+            </div>
+
             {{-- الخطوط --}}
             <div class="bg-white rounded-xl shadow p-6 space-y-4">
                 <h3 class="font-bold border-b border-gray-200 pb-3">الخطوط</h3>

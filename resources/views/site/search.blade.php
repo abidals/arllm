@@ -16,7 +16,7 @@
     <form action="{{ route('site.search') }}" method="GET" class="flex gap-2 max-w-xl mb-10">
         <input type="search" name="q" value="{{ $q }}" placeholder="اكتب كلمة البحث…" maxlength="100" required
                class="flex-1 border-gray-300 rounded-lg px-4 py-2.5 focus:border-gray-900 focus:ring-gray-900">
-        <button class="bg-gray-900 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-700">بحث</button>
+        <button class="bg-brand text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-700">بحث</button>
     </form>
 
     @if ($q !== '' && $posts->isNotEmpty())

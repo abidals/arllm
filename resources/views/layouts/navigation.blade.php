@@ -5,11 +5,18 @@
             <div class="flex items-center min-w-0">
                 <!-- Logo -->
                 <a href="{{ route('admin.dashboard') }}" class="text-white text-xl font-bold shrink-0">
-                    {{ config('app.name') }} <span class="text-red-500">· اللوحة</span>
+                    {{ site_name() }} <span class="text-brand">· اللوحة</span>
                 </a>
 
+                <!-- بحث سريع في كل بيانات اللوحة -->
+                <form action="{{ route('admin.search') }}" method="GET" class="hidden lg:flex items-center ms-4" role="search">
+                    <input type="search" name="q" value="{{ request()->query('q') }}" maxlength="100"
+                           placeholder="ابحث: مقال، صفحة، 2026-09-23…"
+                           class="w-52 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-200 placeholder-gray-500 py-1.5 px-3 focus:border-gray-500">
+                </form>
+
                 <!-- Navigation Links -->
-                <div class="hidden sm:flex items-center gap-1 sm:ms-8">
+                <div class="hidden sm:flex items-center gap-1 sm:ms-4">
                     <a href="{{ route('admin.dashboard') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800' }}">
                         الرئيسية
                     </a>

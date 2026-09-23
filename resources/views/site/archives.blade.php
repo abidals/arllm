@@ -16,7 +16,7 @@
         {{-- مقالات شهر محدد --}}
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold">{{ $monthNames[$selectedMonth] }} {{ $selectedYear }}</h2>
-            <a href="{{ route('site.archives') }}" class="text-sm font-semibold text-red-700 hover:underline">← كل الأشهر</a>
+            <a href="{{ route('site.archives') }}" class="text-sm font-semibold text-brand hover:underline">← كل الأشهر</a>
         </div>
 
         <div class="space-y-4 max-w-3xl">
@@ -24,12 +24,12 @@
                 <a href="{{ route('site.post', $post->slug) }}" class="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-2 text-xs text-gray-500">
                         @if ($post->category)
-                            <span class="text-red-700 font-bold">{{ $post->category->name }}</span>
+                            <span class="text-brand font-bold">{{ $post->category->name }}</span>
                             <span aria-hidden="true">•</span>
                         @endif
                         <time>{{ $post->publishDateShort() }}</time>
                     </div>
-                    <h3 class="font-bold text-lg mt-1.5 leading-snug hover:text-red-700">{{ $post->title }}</h3>
+                    <h3 class="font-bold text-lg mt-1.5 leading-snug hover:text-brand">{{ $post->title }}</h3>
                     @if ($post->excerpt)
                         <p class="text-sm text-gray-600 mt-1.5 font-naskh line-clamp-2">{{ $post->excerpt }}</p>
                     @endif
@@ -44,7 +44,7 @@
             @forelse ($groups as $group)
                 @php [$year, $month] = explode('-', $group->month); @endphp
                 <a href="{{ route('site.archives', ['month' => $group->month]) }}"
-                   class="bg-white rounded-xl border border-gray-200 p-5 text-center hover:border-red-700 hover:shadow-md transition-all">
+                   class="bg-white rounded-xl border border-gray-200 p-5 text-center hover:border-brand hover:shadow-md transition-all">
                     <div class="text-xs text-gray-500">{{ $year }}</div>
                     <div class="text-xl font-bold mt-1">{{ $monthNames[(int) $month] }}</div>
                     <div class="text-xs text-gray-500 mt-2">{{ $group->total }} إصدار</div>

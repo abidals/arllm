@@ -11,10 +11,18 @@
             @endif
         </div>
         <div class="p-4">
-            @if ($post->category)
-                <span class="text-xs font-bold text-red-700">{{ $post->category->name }}</span>
-            @endif
-            <h3 class="font-bold text-lg leading-snug mt-1 group-hover:text-red-700 transition-colors line-clamp-2">
+            <div class="flex items-center gap-2">
+                @if ($post->category)
+                    <span class="text-xs font-bold text-brand">{{ $post->category->name }}</span>
+                @endif
+                @if ($post->is_featured)
+                    <span class="text-[10px] font-bold bg-brand-soft text-brand px-2 py-0.5 rounded-full">مميز ★</span>
+                @endif
+                @if ($post->is_sponsored)
+                    <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{{ \App\Models\Setting::get('sponsored_label', 'محتوى إعلاني') }}</span>
+                @endif
+            </div>
+            <h3 class="font-bold text-lg leading-snug mt-1 group-hover:text-brand transition-colors line-clamp-2">
                 {{ $post->title }}
             </h3>
             @if ($post->excerpt)

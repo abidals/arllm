@@ -18,32 +18,50 @@ class PostController extends Controller
     public function index(Request $request): \Illuminate\View\View
     {
         $status = $request->query('status', 'all');
+        $q = trim((string) $request->query('q', ''));
         $user = Auth::user();
 
         $posts = Post::with(['author', 'category'])
-            ->when(!$user->canPublish(), fn ($q) => $q->where('user_id', $user->id))
+            ->when(!$user->canPublish(), fn ($qq) => $qq->where('user_id', $user->id))
             ->when($status !== 'all' && in_array($status, Post::STATUS),
-                fn ($q) => $q->where('status', $status))
+                fn ($qq) => $qq->where('status', $status))
+            ->when($q !== '', fn ($qq) => $qq->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")
+                    ->orWhere('subtitle', 'like', "%{$q}%")
+                    ->orWhere('excerpt', 'like', "%{$q}%")
+                    ->orWhere('content_md', 'like', "%{$q}%");
+            }))
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
+        $countsBase = fn ($extra = null) => Post::when(!$user->canPublish(), fn ($qq) => $qq->where('user_id', $user->id))
+            ->when($q !== '', fn ($qq) => $qq->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")->orWhere('content_md', 'like', "%{$q}%");
+            }))
+            ->when($extra, $extra)
+            ->count();
+
         return view('admin.posts.index', [
             'posts' => $posts,
             'currentStatus' => $status,
+            'q' => $q,
             'counts' => [
-                'all' => $user->canPublish() ? Post::count() : Post::where('user_id', $user->id)->count(),
-                'draft' => $user->canPublish() ? Post::where('status', 'draft')->count() : Post::where('user_id', $user->id)->where('status', 'draft')->count(),
-                'review' => Post::where('status', 'review')->count(),
-                'scheduled' => Post::where('status', 'scheduled')->count(),
-                'published' => Post::where('status', 'published')->count(),
+                'all' => $countsBase(),
+                'draft' => $countsBase(fn ($c) => $c->where('status', 'draft')),
+                'review' => $countsBase(fn ($c) => $c->where('status', 'review')),
+                'scheduled' => $countsBase(fn ($c) => $c->where('status', 'scheduled')),
+                'published' => $countsBase(fn ($c) => $c->where('status', 'published')),
             ],
         ]);
     }
 
     public function create(): \Illuminate\View\View
     {
-        return view('admin.posts.create', ['categories' => Category::orderBy('sort_order')->get()]);
+        return view('admin.posts.create', [
+            'categories' => Category::orderBy('sort_order')->get(),
+            'featuredCount' => Post::where('is_featured', true)->count(),
+        ]);
     }
 
     public function store(Request $request)
@@ -74,6 +92,7 @@ class PostController extends Controller
             'post' => $post,
             'categories' => Category::orderBy('sort_order')->get(),
             'tags' => $post->tags->pluck('name')->implode(', '),
+            'featuredCount' => Post::where('is_featured', true)->count(),
         ]);
     }
 

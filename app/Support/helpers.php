@@ -69,3 +69,24 @@ if (!function_exists('render_markdown')) {
         return \App\Services\MarkdownRenderer::render($markdown);
     }
 }
+
+if (!function_exists('site_name')) {
+    /** اسم الموقع من الإعدادات (قابل للتغيير من اللوحة) */
+    function site_name(): string
+    {
+        try {
+            return \App\Models\Setting::get('site_name', config('app.name', 'موقعي')) ?: config('app.name');
+        } catch (\Throwable) {
+            return config('app.name', 'موقعي');
+        }
+    }
+}
+
+if (!function_exists('flush_settings_cache')) {
+    function flush_settings_cache(string ...$keys): void
+    {
+        foreach ($keys as $key) {
+            \Illuminate\Support\Facades\Cache::forget("setting.$key");
+        }
+    }
+}

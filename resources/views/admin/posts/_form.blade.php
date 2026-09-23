@@ -107,15 +107,26 @@
 
             <div class="space-y-3 pt-2 border-t border-gray-200">
                 @can('publish')
-                    <label class="flex items-center gap-2 text-sm">
+                    <label class="flex items-start gap-2 text-sm">
                         <input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', isset($post) && $post->is_featured))
-                               class="rounded border-gray-300 text-red-700 focus:ring-red-700">
-                        مقال مميز (واجهة الرئيسية)
+                               class="mt-1 rounded border-gray-300 text-red-700 focus:ring-red-700">
+                        <span>
+                            <strong>مميز (واجهة الرئيسية)</strong>
+                            <span class="block text-[11px] text-gray-500 leading-relaxed mt-0.5">
+                                يُبرز المقال في «مميزة اليوم». الأحدث المنشور يصبح <strong>قصة الغلاف</strong> تلقائيًا.
+                                حاليًا: {{ $featuredCount ?? 0 }} مقال مميز.
+                            </span>
+                        </span>
                     </label>
-                    <label class="flex items-center gap-2 text-sm">
+                    <label class="flex items-start gap-2 text-sm">
                         <input type="checkbox" name="is_sponsored" value="1" @checked(old('is_sponsored', isset($post) && $post->is_sponsored))
-                               class="rounded border-gray-300 text-red-700 focus:ring-red-700">
-                        محتوى إعلاني
+                               class="mt-1 rounded border-gray-300 text-red-700 focus:ring-red-700">
+                        <span>
+                            <strong>محتوى إعلاني</strong>
+                            <span class="block text-[11px] text-gray-500 leading-relaxed mt-0.5">
+                                يظهر في صندوق وسط الرئيسية علائمه الملصق «{{ \App\Models\Setting::get('sponsored_label', 'محتوى إعلاني') }}» — لا يلتحق بالفهرسة الرئيسية.
+                            </span>
+                        </span>
                     </label>
                 @endcan
             </div>

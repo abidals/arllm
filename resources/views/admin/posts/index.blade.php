@@ -9,7 +9,17 @@
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        {{-- فلاتر الحالة --}}
+        {{-- بحث وفلاتر الحالة --}}
+        <form class="flex flex-wrap items-center gap-2 mb-4" action="{{ route('admin.posts.index') }}" method="GET">
+            <input type="hidden" name="status" value="{{ $currentStatus }}">
+            <input type="search" name="q" value="{{ $q }}" maxlength="100" placeholder="ابحث في المقالات بحسب العنوان أو المحتوى…"
+                   class="flex-1 min-w-[220px] border-gray-300 rounded-lg px-4 py-2 text-sm focus:border-gray-900 focus:ring-gray-900">
+            <button class="bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-2 rounded-lg">بحث</button>
+            @if ($q !== '')
+                <a href="{{ route('admin.posts.index', ['status' => $currentStatus]) }}" class="text-xs text-gray-500 hover:underline">مسح</a>
+            @endif
+        </form>
+
         <div class="flex flex-wrap gap-2 mb-6">
             @foreach (['all' => 'الكل', 'draft' => 'مسوداتي', 'review' => 'بانتظار المراجعة', 'scheduled' => 'مجدولة', 'published' => 'منشورة'] as $key => $label)
                 <a href="{{ route('admin.posts.index', ['status' => $key]) }}"

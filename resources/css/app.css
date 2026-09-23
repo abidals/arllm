@@ -139,7 +139,7 @@ body {
 
 .site-nav .nav-top:hover > .nav-sub,
 .site-nav .nav-top:focus-within > .nav-sub,
-.site-nav .nav-top.is-active > .nav-sub {
+.site-nav .nav-top.is-open > .nav-sub {
     display: block;
 }
 
@@ -151,6 +151,35 @@ body {
 @keyframes submenu-in {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== نظام الثيم (ألوان قابلة للتحكم من اللوحة) ==================== */
+
+:root {
+    --brand: #b91c1c;
+    --brand-dark: color-mix(in srgb, var(--brand) 82%, black);
+    --brand-soft: color-mix(in srgb, var(--brand) 10%, white);
+    --dark: #111827;
+}
+
+.text-brand { color: var(--brand); }
+.bg-brand { background-color: var(--brand); }
+.border-brand { border-color: var(--brand); }
+.bg-brand-soft { background-color: var(--brand-soft); }
+.bg-theme-dark { background-color: var(--dark); }
+.border-theme-dark { border-color: var(--dark); }
+
+.hover-brand:hover { color: var(--brand); }
+.hover-brand-dark:hover { background-color: var(--brand-dark); }
+
+.btn-brand {
+    @apply text-white font-semibold rounded-lg inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm transition-colors;
+    background-color: var(--brand);
+}
+.btn-brand:hover { background-color: var(--brand-dark); }
+
+.article-body blockquote {
+    border-color: var(--brand);
 }
 
 /* ==================== شريط الأخبار العاجلة ==================== */
