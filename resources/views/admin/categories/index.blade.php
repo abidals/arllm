@@ -100,4 +100,6 @@
             </div>
         </div>
     </div>
+
+    @vite(['resources/js/admin-cats.js'])
 </x-app-layout>

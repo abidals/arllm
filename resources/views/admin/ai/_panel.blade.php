@@ -27,3 +27,5 @@
     </div>
 @endcan
 @stack('ai-scripts')
+    @vite(['resources/js/ai-admin.js'])
+@stack('ai-scripts-end')

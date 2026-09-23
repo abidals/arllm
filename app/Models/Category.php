@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'sort_order', 'is_active'];
+    protected $fillable = ['name', 'slug', 'description', 'sort_order', 'is_active', 'parent_id'];
 
     protected function casts(): array
     {
@@ -48,5 +48,6 @@ class Category extends Model
     public static function flushCache(): void
     {
         Cache::forget('site.sections');
+        Cache::forget('site.sections.v2');
     }
 }

@@ -24,11 +24,11 @@ if (!function_exists('format_bytes')) {
 }
 
 if (!function_exists('site_sections')) {
-    /** أقسام الموقع الرئيسية (الأقسام الفرعية تُعرض داخل صفحة القسم) */
+    /** أقسام الموقع الرئيسية فقط (الأبناء تصبح داخل صفحة القسم) */
     function site_sections(): array
     {
         try {
-            $data = Cache::rememberForever('site.sections', function () {
+            $data = Cache::rememberForever('site.sections.v2', function () {
                 return \App\Models\Category::query()
                     ->where('is_active', true)
                     ->whereNull('parent_id')
