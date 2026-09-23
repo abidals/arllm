@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== الطباعة العربية ==================== */
+
+:root {
+    --font-arabic-headline: 'IBM Plex Sans Arabic', 'Noto Kufi Arabic', sans-serif;
+    --font-arabic-body: 'Noto Naskh Arabic', 'Amiri', serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-arabic-headline);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+.font-naskh {
+    font-family: var(--font-arabic-body);
+}
+
+/* ==================== محتوى المقال (Markdown) ==================== */
+
+.article-body {
+    font-family: var(--font-arabic-body);
+    font-size: 1.25rem;
+    line-height: 2.1;
+}
+
+.article-body h2 {
+    font-family: var(--font-arabic-headline);
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin: 1.6em 0 0.6em;
+    line-height: 1.5;
+}
+
+.article-body h3 {
+    font-family: var(--font-arabic-headline);
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 1.4em 0 0.5em;
+    line-height: 1.5;
+}
+
+.article-body p {
+    margin-bottom: 1.1em;
+}
+
+.article-body a {
+    @apply underline decoration-2 underline-offset-4 hover:opacity-75;
+}
+
+.article-body ul,
+.article-body ol {
+    margin: 1em 1.4em;
+}
+
+.article-body ul {
+    list-style: disc;
+}
+
+.article-body ol {
+    list-style: arabic-indic;
+}
+
+.article-body blockquote {
+    @apply my-5 border-r-4 pr-4 text-lg text-gray-700 italic;
+    border-color: var(--color-brand-600, #b91c1c);
+}
+
+.article-body img {
+    @apply my-5 rounded-lg mx-auto;
+}
+
+.article-body code {
+    @apply bg-gray-100 rounded px-1.5 py-0.5 text-sm;
+    direction: ltr;
+    unicode-bidi: embed;
+    display: inline-block;
+}
+
+.article-body pre {
+    @apply bg-gray-900 text-gray-100 rounded-lg p-4 my-5 overflow-x-auto text-sm;
+    direction: ltr;
+    text-align: left;
+}
+
+.article-body pre code {
+    @apply bg-transparent p-0 text-gray-100;
+}
+
+.article-body table {
+    @apply my-5 w-full border-collapse rounded-lg overflow-hidden;
+}
+
+.article-body th, .article-body td {
+    @apply border border-gray-300 p-2 text-sm;
+}
+
+.article-body hr {
+    @apply my-8 border-gray-200;
+}
+
+/* تحسينات RTL للأرقام والروابط داخل النص */
+.article-body :not(pre) > code {
+    direction: ltr;
+}
+
+::selection {
+    background: var(--color-brand-200, #fecaca);
+}

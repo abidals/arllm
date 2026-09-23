@@ -1,0 +1,54 @@
+<?php
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+
+if (!function_exists('str_word_count_ar')) {
+    /** Count words in Arabic or any Unicode text. */
+    function str_word_count_ar(string $text): int
+    {
+        $text = strip_tags($text);
+        preg_match_all('/[\p{L}\p{N}_]+/u', $text, $matches);
+
+        return count($matches[0] ?? []);
+    }
+}
+
+if (!function_exists('format_bytes')) {
+    function format_bytes(int $bytes): string
+    {
+        $units = ['بايت', 'كيلوبايت', 'ميغابايت', 'غيغابايت'];
+
+        return round($bytes / pow(1024, $i = floor(log(max($bytes, 1), 1024))), 1).' '.$units[$i];
+    }
+}
+
+if (!function_exists('site_sections')) {
+    /** أقسام الموقع للترويسة والتذييل (مصفوفات بسيطة قابلة للتخزين المؤقت) */
+    function site_sections(): array
+    {
+        try {
+            $data = Cache::rememberForever('site.sections', function () {
+                return \App\Models\Category::query()
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->limit(12)
+                    ->get(['name', 'slug'])
+                    ->map(fn ($c) => ['name' => $c->name, 'slug' => $c->slug])
+                    ->values()
+                    ->all();
+            });
+
+            return is_array($data) ? $data : [];
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+}
+
+if (!function_exists('arabic_date')) {
+    function arabic_date($date = null, string $format = 'dddd، D MMMM YYYY'): string
+    {
+        return ($date ?? now())->locale('ar')->isoFormat($format);
+    }
+}

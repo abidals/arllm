@@ -1,0 +1,64 @@
+name: النشر إلى Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: نشر عبر SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: استنساخ الكود
+        uses: actions/checkout@v4
+
+      - name: تجهيز PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: تثبيت التبعيات (إنتاج)
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: بناء الواجهة
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci && npm run build
+
+      - name: رفع الملفات عبر SSH
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_PORT }}
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          TARGET: ${{ secrets.HOSTINGER_TARGET }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p ${SSH_PORT:-22} "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          rsync -az --delete \
+            --exclude '.git' --exclude 'node_modules' --exclude 'storage/app/public/*' \
+            --exclude '.env' \
+            ./ -e "ssh -p ${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST:$TARGET/app_code/"
+
+      - name: تحديث الخادم (ترحيلات + كاش)
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_USER }}
+          SSH_PORT: ${{ secrets.HOSTINGER_PORT }}
+          TARGET: ${{ secrets.HOSTINGER_TARGET }}
+        run: |
+          ssh -p ${SSH_PORT:-22} "$SSH_USER@$SSH_HOST" "
+            cd $TARGET/releases/current &&
+            composer install --no-dev --optimize-autoloader --no-interaction &&
+            php artisan migrate --force &&
+            php artisan storage:link || true &&
+            php artisan config:cache && php artisan route:cache && php artisan view:cache &&
+            php artisan cache:clear
+          "
