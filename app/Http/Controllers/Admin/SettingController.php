@@ -50,6 +50,19 @@ class SettingController extends Controller
                 'dark_color' => Setting::get('dark_color', '#111827'),
                 'menu_position' => Setting::get('menu_position', 'right'),
 
+                // الهيدر
+                'header_show_date' => Setting::get('header_show_date', '1') === '1',
+                'header_show_search' => Setting::get('header_show_search', '1') === '1',
+                'header_sticky' => Setting::get('header_sticky', '1') === '1',
+
+                // الفوتر
+                'footer_show_sections' => Setting::get('footer_show_sections', '1') === '1',
+                'footer_show_pages' => Setting::get('footer_show_pages', '1') === '1',
+                'footer_show_links' => Setting::get('footer_show_links', '1') === '1',
+
+                // الصفحة الرئيسية
+                'hero_count' => Setting::get('hero_count', '1'),
+
                 // الهوية البصرية
                 'site_logo' => Setting::get('site_logo'),
                 'site_favicon' => Setting::get('site_favicon'),
@@ -89,6 +102,17 @@ class SettingController extends Controller
             'dark_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{3,8}$/'],
             'menu_position' => ['nullable', Rule::in(['right', 'center', 'left'])],
 
+            'header_show_date' => ['nullable', 'boolean'],
+            'header_show_search' => ['nullable', 'boolean'],
+            'header_sticky' => ['nullable', 'boolean'],
+
+            'footer_show_sections' => ['nullable', 'boolean'],
+            'footer_show_pages' => ['nullable', 'boolean'],
+            'footer_show_links' => ['nullable', 'boolean'],
+
+            'featured_strip_count' => ['nullable', 'integer', 'between:0,6'],
+            'hero_count' => ['nullable', 'integer', 'between:1,3'],
+
             'font_heading_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
             'font_body_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
 
@@ -112,13 +136,13 @@ class SettingController extends Controller
             }
         }
 
-        foreach (['comments_enabled', 'ai_enabled', 'ticker_enabled'] as $flag) {
+        foreach (['comments_enabled', 'ai_enabled', 'ticker_enabled', 'header_show_date', 'header_show_search', 'header_sticky', 'footer_show_sections', 'footer_show_pages', 'footer_show_links'] as $flag) {
             if (array_key_exists($flag, $data)) {
                 Setting::set($flag, $data[$flag] ? '1' : '0');
             }
         }
 
-        foreach (['font_heading_family', 'font_body_family', 'ticker_speed', 'ticker_bg', 'ticker_color', 'featured_strip_count', 'brand_color', 'dark_color', 'menu_position'] as $simple) {
+        foreach (['font_heading_family', 'font_body_family', 'ticker_speed', 'ticker_bg', 'ticker_color', 'featured_strip_count', 'brand_color', 'dark_color', 'menu_position', 'hero_count'] as $simple) {
             if (isset($data[$simple])) {
                 Setting::set($simple, (string) $data[$simple]);
             }

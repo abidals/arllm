@@ -88,6 +88,54 @@
                         <label class="block text-sm font-bold mb-1.5">اللون الداكن (الشريط والتذييل)</label>
                         <input name="dark_color" type="color" value="{{ old('dark_color', $settings['dark_color']) }}" class="w-full h-10 rounded-lg border-gray-300">
                     </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1.5">عدد مقالات الهيرو الرئيسية</label>
+                        <input name="hero_count" type="number" min="1" max="3" value="{{ old('hero_count', $settings['hero_count']) }}" class="w-full border-gray-300 rounded-lg">
+                        <p class="text-[11px] text-gray-500 mt-1">1 = غلاف كبير فقط · 2-3 = غلاف + بطاقات جانبية.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- الهيدر والفوتر --}}
+            <div class="bg-white rounded-xl shadow p-6 space-y-4">
+                <h3 class="font-bold border-b border-gray-200 pb-3">التحكم في الهيدر والفوتر</h3>
+                <div class="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+                    <div class="space-y-2.5">
+                        <p class="text-xs font-black text-gray-400">الهيدر</p>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="header_show_date" value="0">
+                            <input type="checkbox" name="header_show_date" value="1" @checked($settings['header_show_date']) class="rounded border-gray-300 text-red-700">
+                            إظهار التاريخ في الشريط العلوي
+                        </label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="header_show_search" value="0">
+                            <input type="checkbox" name="header_show_search" value="1" @checked($settings['header_show_search']) class="rounded border-gray-300 text-red-700">
+                            إظهار زر العدسة (البحث)
+                        </label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="header_sticky" value="0">
+                            <input type="checkbox" name="header_sticky" value="1" @checked($settings['header_sticky']) class="rounded border-gray-300 text-red-700">
+                            تثبيت الهيدر أعلى الشاشة عند التمرير
+                        </label>
+                    </div>
+                    <div class="space-y-2.5">
+                        <p class="text-xs font-black text-gray-400">الفوتر</p>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="footer_show_sections" value="0">
+                            <input type="checkbox" name="footer_show_sections" value="1" @checked($settings['footer_show_sections']) class="rounded border-gray-300 text-red-700">
+                            عمود الأقسام
+                        </label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="footer_show_pages" value="0">
+                            <input type="checkbox" name="footer_show_pages" value="1" @checked($settings['footer_show_pages']) class="rounded border-gray-300 text-red-700">
+                            عمود الصفحات الثابتة
+                        </label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="hidden" name="footer_show_links" value="0">
+                            <input type="checkbox" name="footer_show_links" value="1" @checked($settings['footer_show_links']) class="rounded border-gray-300 text-red-700">
+                            عمود الروابط السريعة
+                        </label>
+                    </div>
                 </div>
             </div>
 

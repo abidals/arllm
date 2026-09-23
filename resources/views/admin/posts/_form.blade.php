@@ -1,10 +1,19 @@
-{{-- نموذج إنشاء/تعديل مقال. الاستخدام: $post (اختياري)، $categories، $tags (اختياري)، $action --}}
+{{-- استيراد ملف .md خارج النموذج الرئيسي (النماذج المتداخلة تفسد DOM)، ينقل إلى الحقل عبر storage ثم يدويًا --}}
 @php
     $action = $action ?? (isset($post) ? route('admin.posts.update', $post) : route('admin.posts.store'));
     $method = isset($post) ? 'PUT' : 'POST';
-    $pending = isset($post) && $post->status === 'review';
-    $scheduledStatus = isset($post) && $post->status === 'scheduled' ? 'scheduled' : '';
 @endphp
+
+{{-- شريط استيراد .md — نموذج مستقل خارج النموذج الرئيسي (التداخل يفسد DOM) --}}
+<div class="lg:col-span-2 rounded-lg border border-blue-100 bg-blue-50/50 p-3 -mb-2">
+    <span class="text-xs font-bold text-blue-900">استيراد ملف Markdown:</span>
+    <form method="POST" action="{{ route('admin.posts.import-md') }}" enctype="multipart/form-data" class="mt-2 flex flex-wrap items-center gap-2">
+        @csrf
+        <input type="file" name="file" accept=".md,.markdown,.txt" required
+               class="block flex-1 min-w-[200px] text-xs border border-blue-200 rounded file:me-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-blue-700 file:text-white">
+        <button class="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-blue-800">تحويل إلى المحتوى</button>
+    </form>
+</div>
 
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
     @csrf
@@ -15,9 +24,9 @@
     {{-- العمود الرئيسي --}}
     <div class="space-y-5">
         <div class="bg-white rounded-xl shadow p-6 space-y-5">
-            @if (session('imported_markdown') && !isset($post))
+            @if (session('imported_markdown'))
                 <div class="rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-900">
-                    تم استيراد الملف «<strong>{{ session('imported_title') }}</strong>» — المحتوى أدناه.
+                    تم استيراد الملف «<strong>{{ session('imported_title') }}</strong>» — تحقق من المحتوى أدناه.
                 </div>
             @endif
 
@@ -45,17 +54,6 @@
             <div>
                 <div class="flex items-center justify-between mb-1.5">
                     <label for="content_md" class="text-sm font-bold">المحتوى (Markdown) <span class="text-red-600">*</span></label>
-
-                    {{-- استيراد ملف .md --}}
-                    <details class="text-sm">
-                        <summary class="cursor-pointer font-semibold text-blue-700 hover:underline">استيراد ملف .md</summary>
-                        <form method="POST" action="{{ route('admin.posts.import-md') }}" enctype="multipart/form-data" class="mt-2 flex items-center gap-2">
-                            @csrf
-                            <input type="file" name="file" accept=".md,.markdown,.txt" required
-                                   class="block w-56 text-xs border border-gray-300 rounded file:me-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white file:text-xs">
-                            <button class="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded">تحويل</button>
-                        </form>
-                    </details>
                 </div>
 
                 <textarea id="content_md" name="content_md" rows="20" required

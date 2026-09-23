@@ -4,8 +4,8 @@
     @include('site.partials.ticker')
 
     @if ($featured)
-        {{-- المقال الرئيسي --}}
-        <section class="mb-10">
+        {{-- الهيرو: غلاف + جانبية بأكثر من مقال مميز --}}
+        <section class="mb-10 grid lg:grid-cols-[2.2fr_1fr] gap-5 items-stretch">
             <a href="{{ route('site.post', $featured->slug) }}" class="group block relative rounded-2xl overflow-hidden">
                 <div class="aspect-[21/9] max-h-[420px] bg-gray-800">
                     @if ($featured->featured_image)
@@ -35,6 +35,34 @@
                     </div>
                 </div>
             </a>
+
+            {{-- المقالات المميزة الجانبية --}}
+            @if ($heroSide->isNotEmpty())
+                <div class="grid grid-cols-1 gap-5">
+                    @foreach ($heroSide->take(2) as $side)
+                        <a href="{{ route('site.post', $side->slug) }}" class="group relative rounded-2xl overflow-hidden bg-gray-800">
+                            <div class="aspect-[16/7] lg:h-[201px]">
+                                @if ($side->featured_image)
+                                    <img src="{{ Storage::url($side->featured_image) }}" alt="{{ $side->title }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-bl from-gray-800 via-red-950/70 to-gray-900"></div>
+                                @endif
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-0 right-0 p-4">
+                                @if ($side->category)
+                                    <span class="text-brand font-bold text-[10px] bg-white/90 px-2 py-0.5 rounded-full">{{ $side->category->name }}</span>
+                                @endif
+                                <h3 class="text-white font-bold text-base leading-snug mt-1.5 group-hover:underline decoration-2 underline-offset-4 line-clamp-2">
+                                    {{ $side->title }}
+                                </h3>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="hidden lg:block"></div>
+            @endif
         </section>
     @endif
 

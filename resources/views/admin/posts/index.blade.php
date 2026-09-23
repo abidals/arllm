@@ -9,15 +9,54 @@
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        {{-- بحث وفلاتر الحالة --}}
-        <form class="flex flex-wrap items-center gap-2 mb-4" action="{{ route('admin.posts.index') }}" method="GET">
-            <input type="hidden" name="status" value="{{ $currentStatus }}">
-            <input type="search" name="q" value="{{ $q }}" maxlength="100" placeholder="ابحث في المقالات بحسب العنوان أو المحتوى…"
-                   class="flex-1 min-w-[220px] border-gray-300 rounded-lg px-4 py-2 text-sm focus:border-gray-900 focus:ring-gray-900">
-            <button class="bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-2 rounded-lg">بحث</button>
-            @if ($q !== '')
-                <a href="{{ route('admin.posts.index', ['status' => $currentStatus]) }}" class="text-xs text-gray-500 hover:underline">مسح</a>
+        {{-- بحث وفلاتر الحالة والتاريخ والقسم والكاتب --}}
+        <form class="bg-white rounded-xl shadow p-4 mb-4 grid sm:grid-cols-2 lg:grid-cols-6 gap-2 items-end" action="{{ route('admin.posts.index') }}" method="GET">
+            <div class="lg:col-span-2">
+                <label class="block text-[11px] font-bold text-gray-500 mb-1">بحث نصي</label>
+                <input type="search" name="q" value="{{ $q }}" maxlength="100" placeholder="عنوان أو محتوى…"
+                       class="w-full border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1">الحالة</label>
+                <select name="status" class="w-full border-gray-300 rounded-lg py-2 text-sm bg-white" onchange="this.form.submit()">
+                    @foreach (['all' => 'الكل', 'draft' => 'مسودة', 'review' => 'مراجعة', 'scheduled' => 'مجدولة', 'published' => 'منشورة'] as $key => $label)
+                        <option value="{{ $key }}" @selected($currentStatus === $key)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1">القسم</label>
+                <select name="category_id" class="w-full border-gray-300 rounded-lg py-2 text-sm bg-white">
+                    <option value="">كل الأقسام</option>
+                    @foreach ($filterCategories as $fc)
+                        <optgroup label="{{ $fc->name }}">
+                            <option value="{{ $fc->id }}" @selected($filters['category_id'] == $fc->id)>{{ $fc->name }} — الكل</option>
+                            @foreach ($fc->children as $child)
+                                <option value="{{ $child->id }}" @selected($filters['category_id'] == $child->id)>— {{ $child->name }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+            </div>
+            @if ($filterAuthors->isNotEmpty())
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 mb-1">الكاتب</label>
+                    <select name="author_id" class="w-full border-gray-300 rounded-lg py-2 text-sm bg-white">
+                        <option value="">الكل</option>
+                        @foreach ($filterAuthors as $fa)
+                            <option value="{{ $fa->id }}" @selected($filters['author_id'] == $fa->id)>{{ $fa->approvedName() }}</option>
+                        @endforeach
+                    </select>
+                </div>
             @endif
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1">تاريخ النشر</label>
+                <input type="date" name="date" value="{{ $filters['date'] }}" class="w-full border-gray-300 rounded-lg py-1.5 text-sm">
+            </div>
+            <div class="flex gap-2">
+                <button class="bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-2 rounded-lg">تصفية</button>
+                <a href="{{ route('admin.posts.index') }}" class="text-xs text-gray-500 hover:underline py-2">مسح</a>
+            </div>
         </form>
 
         <div class="flex flex-wrap gap-2 mb-6">

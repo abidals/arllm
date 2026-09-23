@@ -14,18 +14,25 @@ class SiteController extends Controller
 {
     public function index(): View
     {
-        $featured = Post::published()
+        // الهيرو: أحدث المقالات المميزة — حتى hero_count منها كمديلة إصدار
+        $heroCount = min(4, max(1, (int) \App\Models\Setting::get('hero_count', '1')));
+        $featuredAll = Post::published()
             ->with(['author', 'category'])
             ->where('is_featured', true)
             ->latest('published_at')
-            ->limit(1)
-            ->first();
+            ->limit($heroCount)
+            ->get();
 
-        // شريط المميزات: مقالات مميزة أخرى (أنواع إبراز متعددة)
+        $featured = $featuredAll->first();
+        $heroSide = $featuredAll->slice(1)->values();
+
+        $featuredIds = $featuredAll->pluck('id')->all();
+
+        // شريط المميزات: باقي المميزات غير الهيرو
         $featuredStrip = Post::published()
             ->with(['author', 'category'])
             ->where('is_featured', true)
-            ->when($featured, fn ($q) => $q->where('id', '!=', $featured->id))
+            ->when($featuredIds, fn ($q) => $q->whereNotIn('id', $featuredIds))
             ->latest('published_at')
             ->limit(max(0, (int) \App\Models\Setting::get('featured_strip_count', '3')))
             ->get();
@@ -62,6 +69,7 @@ class SiteController extends Controller
 
         return view('site.index', [
             'featured' => $featured,
+            'heroSide' => $heroSide,
             'featuredStrip' => $featuredStrip,
             'sponsored' => $sponsored,
             'posts' => $latest,

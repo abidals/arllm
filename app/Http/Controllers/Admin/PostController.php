@@ -19,7 +19,17 @@ class PostController extends Controller
     {
         $status = $request->query('status', 'all');
         $q = trim((string) $request->query('q', ''));
+        $categoryId = $request->query('category_id');
+        $authorId = $request->query('author_id');
+        $date = $request->query('date');
         $user = Auth::user();
+
+        $filters = [
+            'q' => $q,
+            'category_id' => $categoryId,
+            'author_id' => $authorId,
+            'date' => $date,
+        ];
 
         $posts = Post::with(['author', 'category'])
             ->when(!$user->canPublish(), fn ($qq) => $qq->where('user_id', $user->id))
@@ -31,6 +41,17 @@ class PostController extends Controller
                     ->orWhere('excerpt', 'like', "%{$q}%")
                     ->orWhere('content_md', 'like', "%{$q}%");
             }))
+            ->when($categoryId, fn ($qq) => $qq->whereIn('category_id', Category::find($categoryId)?->allPostIds() ?? [(int) $categoryId]))
+            ->when($authorId, fn ($qq) => $qq->where('user_id', $authorId))
+            ->when($date !== null && $date !== '', function ($qq) use ($date) {
+                try {
+                    $day = \Illuminate\Support\Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                } catch (\Throwable) {
+                    return;
+                }
+
+                $qq->whereBetween('published_at', [$day, (clone $day)->endOfDay()]);
+            })
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -39,6 +60,8 @@ class PostController extends Controller
             ->when($q !== '', fn ($qq) => $qq->where(function ($w) use ($q) {
                 $w->where('title', 'like', "%{$q}%")->orWhere('content_md', 'like', "%{$q}%");
             }))
+            ->when($categoryId, fn ($qq) => $qq->whereIn('category_id', Category::find($categoryId)?->allPostIds() ?? [(int) $categoryId]))
+            ->when($authorId, fn ($qq) => $qq->where('user_id', $authorId))
             ->when($extra, $extra)
             ->count();
 
@@ -46,6 +69,9 @@ class PostController extends Controller
             'posts' => $posts,
             'currentStatus' => $status,
             'q' => $q,
+            'filters' => $filters,
+            'filterCategories' => Category::parents()->with('children')->get(),
+            'filterAuthors' => $user->canPublish() ? \App\Models\User::orderBy('name')->get(['id', 'name', 'display_name']) : collect(),
             'counts' => [
                 'all' => $countsBase(),
                 'draft' => $countsBase(fn ($c) => $c->where('status', 'draft')),
