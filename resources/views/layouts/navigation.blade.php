@@ -36,6 +36,9 @@
                             الصفحات
                         </a>
                     @endcan
+                    <a href="{{ route('admin.media.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.media.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800' }}">
+                        الوسائط
+                    </a>
                     @can('manage-users')
                         <a href="{{ route('admin.users.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.users.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800' }}">
                             المستخدمون

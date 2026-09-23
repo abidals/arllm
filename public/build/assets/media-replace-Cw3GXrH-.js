@@ -1,0 +1,1 @@
+(function(){document.querySelectorAll(`[data-replace-input]`).forEach(e=>{e.addEventListener(`change`,()=>{e.value&&e.closest(`form`).submit()})})})();

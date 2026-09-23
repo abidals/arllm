@@ -167,10 +167,17 @@
             <h3 class="font-bold border-b border-gray-200 pb-3">الصورة الرئيسية</h3>
             @if (isset($post) && $post->featured_image)
                 <img src="{{ Storage::url($post->featured_image) }}" alt="" class="rounded-lg w-full">
+                <form method="POST" action="{{ route('admin.posts.remove-image', $post) }}"
+                      onsubmit="return confirm('إزالة الصورة الرئيسية وحذف ملفها؟')">
+                    @csrf
+                    <button class="w-full text-red-700 border border-red-200 rounded-lg py-2 text-xs font-semibold hover:bg-red-50">
+                        إزالة الصورة الرئيسية
+                    </button>
+                </form>
             @endif
             <input type="file" name="featured_image" accept=".jpg,.jpeg,.png,.webp,.gif"
                    class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">
-            <p class="text-xs text-gray-500">jpg/png/webp/gif — حتى 4MB.</p>
+            <p class="text-xs text-gray-500">jpg/png/webp/gif — حتى 4MB. الاستبدال يحتفظ بالقديمة في مكتبة الوسائط.</p>
             @error('featured_image') <p class="text-red-600 text-xs">{{ $message }}</p> @enderror
         </div>
 

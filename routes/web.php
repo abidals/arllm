@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AiController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\SettingController;
@@ -68,7 +69,15 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
         Route::post('posts/{post}/submit-review', [PostController::class, 'submitReview'])->name('posts.review');
         Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
         Route::post('posts/{post}/unpublish', [PostController::class, 'unpublish'])->name('posts.unpublish');
+        Route::post('posts/{post}/remove-image', [PostController::class, 'removeImage'])->name('posts.remove-image');
         Route::post('posts/import-md', [PostController::class, 'importMarkdown'])->name('posts.import-md');
+
+        // مكتبة الوسائط
+        Route::get('media', [MediaController::class, 'index'])->name('media.index');
+        Route::post('media', [MediaController::class, 'store'])->name('media.store');
+        Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+        Route::post('media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
+        Route::post('media/{media}/replace', [MediaController::class, 'replace'])->name('media.replace');
 
         // صفحات ثابتة (من نحن، الخصوصية…)
         Route::middleware('can:manage-pages')->group(function () {

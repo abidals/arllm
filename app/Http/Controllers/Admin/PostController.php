@@ -139,7 +139,10 @@ class PostController extends Controller
         $post->applyIncomingStatus($request, Auth::user());
         if ($request->hasFile('featured_image')) {
             if ($post->featured_image) {
-                Storage::disk('public')->delete($post->featured_image);
+                if ($request->boolean('remove_old_image')) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($post->featured_image);
+                    \App\Models\Media::where('path', $post->featured_image)->delete();
+                }
             }
             $post->featured_image = $this->handleImage($request, $post);
         }
@@ -229,13 +232,36 @@ class PostController extends Controller
 
         $name = bin2hex(random_bytes(16)).'.'.$ext;
 
-        $file->storeAs(
-            'posts/'.now()->format('Y/m'),
-            $name,
-            'public'
-        );
+        $path = 'posts/'.now()->format('Y/m').'/'.$name;
+        $file->storeAs(dirname($path), $name, 'public');
 
-        return 'posts/'.now()->format('Y/m').'/'.$name;
+        \App\Models\Media::create([
+            'user_id' => Auth::id(),
+            'path' => $path,
+            'original_name' => mb_substr($file->getClientOriginalName(), 0, 100),
+            'mime_type' => strtolower($file->getMimeType() ?? ''),
+            'size' => \Illuminate\Support\Facades\Storage::disk('public')->size($path),
+        ]);
+
+        return $path;
+    }
+
+    /**
+     * إزالة الصورة الرئيسية من مقال وحذف ملفها.
+     */
+    public function removeImage(Post $post)
+    {
+        $this->authorize('update', $post);
+
+        if ($post->featured_image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($post->featured_image);
+            \App\Models\Media::where('path', $post->featured_image)->delete();
+
+            $post->featured_image = null;
+            $post->save();
+        }
+
+        return back()->with('status', 'تم إزالة الصورة الرئيسية.');
     }
 
     private function validatePost(Request $request, ?int $postId = null): array

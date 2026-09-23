@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BjxmOjFp.css",
+    "file": "assets/app-BqRxIArF.css",
     "name": "app",
     "names": [
       "app.css"
@@ -24,6 +24,12 @@
     "file": "assets/app-BvRk9kiK.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/media-replace.js": {
+    "file": "assets/media-replace-Cw3GXrH-.js",
+    "name": "media-replace",
+    "src": "resources/js/media-replace.js",
     "isEntry": true
   },
   "resources/js/site-nav.js": {
