@@ -57,6 +57,16 @@
                 <p class="text-xs text-gray-500 mt-1">لا يمكنك تغيير دورك الخاص.</p>
             @endif
         </div>
+
+        <div>
+            <label class="block text-sm font-bold mb-1.5">الصورة الشخصية</label>
+            @if ($editing && $editingUser->avatar)
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($editingUser->avatar) }}" alt="" class="w-14 h-14 rounded-full object-cover border mb-2">
+            @endif
+            <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.webp"
+                   class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">
+            @error('avatar') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
     </div>
 
     <div class="flex gap-3">

@@ -24,13 +24,14 @@ if (!function_exists('format_bytes')) {
 }
 
 if (!function_exists('site_sections')) {
-    /** أقسام الموقع للترويسة والتذييل (مصفوفات بسيطة قابلة للتخزين المؤقت) */
+    /** أقسام الموقع الرئيسية (الأقسام الفرعية تُعرض داخل صفحة القسم) */
     function site_sections(): array
     {
         try {
             $data = Cache::rememberForever('site.sections', function () {
                 return \App\Models\Category::query()
                     ->where('is_active', true)
+                    ->whereNull('parent_id')
                     ->orderBy('sort_order')
                     ->limit(12)
                     ->get(['name', 'slug'])

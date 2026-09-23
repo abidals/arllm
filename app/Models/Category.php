@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
@@ -18,8 +20,33 @@ class Category extends Model
         return $this->hasMany(Post::class);
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+    }
+
+    public function scopeParents(Builder $query): Builder
+    {
+        return $query->whereNull('parent_id')->orderBy('sort_order');
+    }
+
+    public function allPostIds(): array
+    {
+        return $this->children()->pluck('id')->prepend($this->id)->all();
+    }
+
     public function publishedPosts()
     {
         return $this->hasMany(Post::class)->published();
+    }
+
+    public static function flushCache(): void
+    {
+        Cache::forget('site.sections');
     }
 }

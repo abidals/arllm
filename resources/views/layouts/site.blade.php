@@ -12,14 +12,49 @@
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.png'))">
 
+    @php
+        $headingFamily = \App\Models\Setting::get('font_heading_family', 'IBM Plex Sans Arabic');
+        $bodyFamily = \App\Models\Setting::get('font_body_family', 'Noto Naskh Arabic');
+        $fontFamilies = array_values(array_unique([$headingFamily, $bodyFamily, 'IBM Plex Sans Arabic', 'Noto Naskh Arabic']));
+        $familiesQuery = implode('&family=', array_map(fn ($f) => str_replace(' ', '+', $f).':wght@400;500;600;700', $fontFamilies));
+    @endphp
+
     @stack('styles')
 
-    {{-- خطوط Google العربية --}}
+    {{-- خطوط Google العربية (خيار الإعدادات) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family={{ $familiesQuery }}&display=swap" rel="stylesheet">
+
+    @if ($fav = \App\Models\Setting::get('site_favicon'))
+        <link rel="icon" href="{{ Storage::url($fav) }}">
+    @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- تخصيص الخطوط والهوية من الإعدادات (يجب أن تسبق الستايل) --}}
+    <style>
+        :root {
+            --font-arabic-headline: '{{ $headingFamily }}', 'Noto Kufi Arabic', sans-serif;
+            --font-arabic-body: '{{ $bodyFamily }}', 'Amiri', serif;
+        }
+        @if ($headingFontPath = \App\Models\Setting::get('heading_font_path'))
+            @font-face {
+                font-family: 'CustomHeadingFont';
+                src: url('{{ Storage::url($headingFontPath) }}') format('woff2');
+                font-display: swap;
+            }
+            :root { --font-arabic-headline: 'CustomHeadingFont', sans-serif; }
+        @endif
+        @if ($bodyFontPath = \App\Models\Setting::get('body_font_path'))
+            @font-face {
+                font-family: 'CustomBodyFont';
+                src: url('{{ Storage::url($bodyFontPath) }}') format('woff2');
+                font-display: swap;
+            }
+            :root { --font-arabic-body: 'CustomBodyFont', serif; }
+        @endif
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
@@ -28,6 +63,7 @@
         <div class="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
             <span class="hidden sm:block font-medium">{{ now()->locale('ar')->isoFormat('dddd، D MMMM YYYY') }}</span>
             <div class="flex items-center gap-4">
+                <a href="{{ route('site.issue') }}" class="font-bold text-red-300 hover:text-red-200">عدد اليوم</a>
                 <a href="{{ route('site.archives') }}" class="hover:text-white">الأرشيف</a>
                 @if (auth()->check())
                     @if (auth()->user()->can('access-dashboard'))
@@ -48,10 +84,14 @@
     <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between py-3">
-                <a href="{{ route('home') }}" class="flex items-baseline gap-2">
-                    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-950">
-                        {{ config('app.name') }}
-                    </h1>
+                <a href="{{ route('home') }}" class="flex items-center gap-3">
+                    @if ($logo = \App\Models\Setting::get('site_logo'))
+                        <img src="{{ Storage::url($logo) }}" alt="{{ config('app.name') }}" class="h-10 sm:h-12 w-auto object-contain">
+                    @else
+                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-950">
+                            {{ config('app.name') }}
+                        </h1>
+                    @endif
                 </a>
 
                 <form role="search" action="{{ route('site.search') }}" method="GET" class="flex items-center gap-2">

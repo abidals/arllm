@@ -21,6 +21,15 @@ class SiteController extends Controller
             ->limit(1)
             ->first();
 
+        // شريط المميزات: مقالات مميزة أخرى (أنواع إبراز متعددة)
+        $featuredStrip = Post::published()
+            ->with(['author', 'category'])
+            ->where('is_featured', true)
+            ->when($featured, fn ($q) => $q->where('id', '!=', $featured->id))
+            ->latest('published_at')
+            ->limit(max(0, (int) \App\Models\Setting::get('featured_strip_count', '3')))
+            ->get();
+
         $sponsored = Post::published()
             ->with(['category'])
             ->where('is_sponsored', true)
@@ -30,8 +39,8 @@ class SiteController extends Controller
 
         $latest = Post::published()
             ->with(['author', 'category'])
-            ->orderByDesc('is_featured')
             ->latest('published_at')
+            ->where('is_featured', false)
             ->limit(21)
             ->get();
 
@@ -41,11 +50,23 @@ class SiteController extends Controller
             ->limit(5)
             ->get();
 
+        $ticker = \App\Models\Setting::get('ticker_enabled', '0') === '1' ? [
+            'lines' => collect(preg_split('/[\r\n|]+/u', (string) \App\Models\Setting::get('ticker_text', '')))
+                ->map(fn ($line) => trim($line))
+                ->filter()
+                ->values(),
+            'speed' => max(10, (int) \App\Models\Setting::get('ticker_speed', '30')),
+            'bg' => \App\Models\Setting::get('ticker_bg', '#111827'),
+            'color' => \App\Models\Setting::get('ticker_color', '#f9fafb'),
+        ] : null;
+
         return view('site.index', [
             'featured' => $featured,
+            'featuredStrip' => $featuredStrip,
             'sponsored' => $sponsored,
             'posts' => $latest,
             'mostRead' => $mostRead,
+            'ticker' => $ticker,
         ]);
     }
 
@@ -53,12 +74,18 @@ class SiteController extends Controller
     {
         abort_unless($category->is_active, 404);
 
-        $posts = $category->publishedPosts()
+        // المقالات تُسحب من القسم وجميع أقسامه الفرعية
+        $posts = Post::published()
             ->with(['author', 'category'])
+            ->whereIn('category_id', $category->allPostIds())
             ->latest('published_at')
             ->paginate(12);
 
-        return view('site.category', ['category' => $category, 'posts' => $posts]);
+        return view('site.category', [
+            'category' => $category,
+            'children' => $category->children()->where('is_active', true)->get(),
+            'posts' => $posts,
+        ]);
     }
 
     public function post(Post $post, Request $request): View
@@ -110,6 +137,54 @@ class SiteController extends Controller
         }
 
         return view('site.search', ['q' => $q, 'posts' => $posts]);
+    }
+
+    /**
+     * صفحة العدد اليومي — مجلة احترافية لتغطية يوم واحد.
+     */
+    public function issue(Request $request): View
+    {
+        $date = $request->route('date');
+        $day = null;
+
+        if ($date && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            try {
+                $day = \Illuminate\Support\Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+            } catch (\Throwable) {
+                abort(404);
+            }
+        } else {
+            $day = now()->startOfDay();
+        }
+
+        $from = (clone $day)->startOfDay();
+        $to = (clone $day)->endOfDay();
+
+        $all = Post::published()
+            ->with(['author', 'category'])
+            ->whereBetween('published_at', [$from, $to])
+            ->orderByDesc('is_featured')
+            ->orderByDesc('views')
+            ->get();
+
+        $cover = $all->firstWhere('is_featured') && $all->first()->is_featured ? $all->first() : null;
+
+        $grouped = $all
+            ->when($cover, fn ($items) => $items->reject(fn ($p) => $p->id === $cover->id))
+            ->groupBy(fn ($post) => $post->category?->name ?? 'عام');
+
+        if ($day->isToday()) {
+            $title = 'عدد اليوم';
+        } else {
+            $title = 'عدد '.$day->locale('ar')->isoFormat('D MMMM YYYY');
+        }
+
+        return view('site.issue', [
+            'title' => $title,
+            'day' => $day,
+            'cover' => $cover,
+            'sections' => $grouped,
+        ]);
     }
 
     public function archives(Request $request): View

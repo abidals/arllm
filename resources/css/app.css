@@ -114,3 +114,42 @@ body {
 ::selection {
     background: var(--color-brand-200, #fecaca);
 }
+
+/* ==================== شريط الأخبار العاجلة ==================== */
+
+.ticker {
+    @apply flex items-stretch overflow-hidden rounded-xl shadow-sm mb-8 h-11;
+}
+
+.ticker-badge {
+    @apply flex items-center px-4 font-bold text-xs tracking-wider shrink-0 z-10;
+    background: rgba(0,0,0,0.25);
+}
+
+.ticker-window {
+    @apply flex-1 overflow-hidden relative h-full;
+}
+
+.ticker-track {
+    @apply flex items-center h-full whitespace-nowrap;
+    animation-name: ticker-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.ticker-seq {
+    @apply flex items-center shrink-0;
+}
+
+.ticker-item {
+    @apply text-sm font-semibold px-5;
+}
+
+@keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none; }
+}

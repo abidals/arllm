@@ -1,6 +1,8 @@
 @extends('layouts.site')
 
 @section('content')
+    @include('site.partials.ticker')
+
     @if ($featured)
         {{-- المقال الرئيسي --}}
         <section class="mb-10">
@@ -36,15 +38,27 @@
         </section>
     @endif
 
+    {{-- شريط المميزات (أنواع إبراز إضافية) --}}
+    @if ($featuredStrip->isNotEmpty())
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold border-b-4 border-red-700 inline-block pb-1">مميزة اليوم</h3>
+                <a href="{{ route('site.issue') }}" class="text-sm font-semibold text-red-700 hover:underline">العدد الكامل ←</a>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-5">
+                @foreach ($featuredStrip as $post)
+                    @include('site.partials.post-card', ['post' => $post, 'showCategory' => true])
+                @endforeach
+            </div>
+        </section>
+    @endif
+
     <div class="grid lg:grid-cols-[1fr_300px] gap-10">
         {{-- التدفق الرئيسي --}}
         <section>
             <h3 class="text-xl font-bold border-b-4 border-red-700 inline-block pb-1 mb-6">أجدد القصص</h3>
             <div class="grid sm:grid-cols-2 gap-6">
                 @forelse ($posts as $post)
-                    @if ($featured && $loop->first && $featured->id === $post->id)
-                        @continue
-                    @endif
                     @include('site.partials.post-card', ['post' => $post, 'showCategory' => true])
                 @empty
                     <p class="text-gray-500 col-span-2 py-12 text-center">لا توجد مقالات منشورة بعد.</p>

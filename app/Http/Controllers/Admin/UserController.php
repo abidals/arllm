@@ -61,6 +61,22 @@ class UserController extends Controller
             $user->password = Hash::make($data['password']);
         }
 
+        if ($request->hasFile('avatar')) {
+            $request->validate(['avatar' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048']]);
+
+            if ($user->avatar) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            $file = $request->file('avatar');
+            $ext = strtolower($file->getClientOriginalExtension());
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                $name = bin2hex(random_bytes(16)).'.'.$ext;
+                $file->storeAs('avatars', $name, 'public');
+                $user->avatar = 'avatars/'.$name;
+            }
+        }
+
         $user->save();
 
         if (!empty($data['role']) && $user->id !== auth()->id()) {

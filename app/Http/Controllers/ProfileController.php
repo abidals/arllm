@@ -26,15 +26,30 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->safe()->except(['avatar']));
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            $file = $request->file('avatar');
+            $ext = strtolower($file->getClientOriginalExtension());
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                $name = bin2hex(random_bytes(16)).'.'.$ext;
+                $file->storeAs('avatars', $name, 'public');
+                $user->avatar = 'avatars/'.$name;
+            }
         }
 
-        $request->user()->save();
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'تم تحديث ملفك الشخصي.');
     }
 
     /**

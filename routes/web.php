@@ -27,6 +27,7 @@ Route::get('section/{category:slug}', [SiteController::class, 'category'])->name
 Route::get('author/{author}', [SiteController::class, 'author'])->name('site.author');
 Route::get('p/{post:slug}', [SiteController::class, 'post'])->name('site.post');
 Route::get('page/{page:slug}', [PageController::class, 'show'])->name('site.page');
+Route::get('issue/{date?}', [SiteController::class, 'issue'])->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')->name('site.issue');
 
 Route::post('p/{post:slug}/comments', [PostCommentController::class, 'store'])
     ->middleware('throttle:comments')
@@ -91,6 +92,7 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
 
         // الأقسام
         Route::middleware('can:manage-categories')->group(function () {
+            Route::post('categories/reorder', [CategoryController::class, 'reorder'])->name('categories.reorder');
             Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
         });
 
