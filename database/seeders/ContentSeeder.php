@@ -14,11 +14,14 @@ class ContentSeeder extends Seeder
     {
         /* ---------------- المستخدمون ---------------- */
 
+        // كلمة مر谷 أول الحسابات: من ENV أو عشوائية تظهر مرة واحدة في السجل
+        $demoPassword = env('SEED_DEMO_PASSWORD') ?: 'ChangeMe!'.bin2hex(random_bytes(4));
+
         $admin = User::create([
             'name' => 'admin',
             'display_name' => 'رئيس التحرير',
             'email' => 'admin@example.com',
-            'password' => Hash::make('Pass@12345'),
+            'password' => Hash::make($demoPassword),
             'bio' => 'يشرف على الغرفة الإخبارية ويراجع كل إصدارات الموقع.',
         ]);
         $admin->assignRole('admin');
@@ -27,7 +30,7 @@ class ContentSeeder extends Seeder
             'name' => 'editor',
             'display_name' => 'سلمى المحررة',
             'email' => 'editor@example.com',
-            'password' => Hash::make('Pass@12345'),
+            'password' => Hash::make($demoPassword),
             'bio' => 'محررة اقتصاد وتقنية، مسؤولة عن مراجعة الصفحة الأولى.',
         ]);
         $editor->assignRole('editor');
@@ -36,10 +39,12 @@ class ContentSeeder extends Seeder
             'name' => 'author',
             'display_name' => 'يارا الكاتبة',
             'email' => 'author@example.com',
-            'password' => Hash::make('Pass@12345'),
+            'password' => Hash::make($demoPassword),
             'bio' => 'كاتبة مستقلة تتابع ملفات الثقافة والمجتمع.',
         ]);
         $author->assignRole('author');
+
+        $this->command?->warn('كلمة مرور الحسابات التجريبية (غيّرها فورًا): '.$demoPassword);
 
         /* ---------------- الأقسام ---------------- */
 
