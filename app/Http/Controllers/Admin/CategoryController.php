@@ -32,7 +32,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $data = $this->validated($request, $category);
+        $data = $this->validated($request, $category->id);
         $data['slug'] = $this->slug($data['name'], $category->slug);
 
         $category->update($data);

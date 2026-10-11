@@ -30,6 +30,10 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
         $response->headers->set('X-XSS-Protection', '0');
+        $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+        // إخفاء بصمة PHP
+        header_remove('X-Powered-By');
 
         return $response;
     }
