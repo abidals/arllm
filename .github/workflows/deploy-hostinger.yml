@@ -14,21 +14,6 @@ jobs:
       - name: استنساخ الكود
         uses: actions/checkout@v4
 
-      - name: تجهيز PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer
-
-      - name: تثبيت التبعيات (إنتاج)
-        run: composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
-
-      - name: بناء الواجهة
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: npm ci && npm run build
-
       - name: رفع الملفات عبر SSH
         env:
           SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
@@ -42,23 +27,42 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p ${SSH_PORT:-22} "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
+          # 1) الكود إلى app_code (خارج public_html)
           rsync -az --delete \
-            --exclude '.git' --exclude 'node_modules' --exclude 'storage/app/public/*' \
-            --exclude '.env' \
+            --exclude '.git' --exclude 'node_modules' \
+            --exclude '.env' --exclude 'storage/logs/*' --exclude 'storage/app/public/*' \
+            ./ -e "ssh -p ${SSH_PORT:-22}" "$SSH_USER@$SSH_TARGET_PLACEHOLDER:$TARGET/app_code/" 2>/dev/null || \
+          rsync -az --delete \
+            --exclude '.git' --exclude 'node_modules' \
+            --exclude '.env' --exclude 'storage/logs/*' --exclude 'storage/app/public/*' \
             ./ -e "ssh -p ${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST:$TARGET/app_code/"
 
-      - name: تحديث الخادم (ترحيلات + كاش)
+      - name: تثبيت وترحيل ومزامنة public_html
         env:
           SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
           SSH_USER: ${{ secrets.HOSTINGER_USER }}
           SSH_PORT: ${{ secrets.HOSTINGER_PORT }}
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
           TARGET: ${{ secrets.HOSTINGER_TARGET }}
+          PHP: /opt/alt/php85/usr/bin/php
         run: |
-          ssh -p ${SSH_PORT:-22} "$SSH_USER@$SSH_HOST" "
-            cd $TARGET/releases/current &&
-            composer install --no-dev --optimize-autoloader --no-interaction &&
-            php artisan migrate --force &&
-            php artisan storage:link || true &&
-            php artisan config:cache && php artisan route:cache && php artisan view:cache &&
-            php artisan cache:clear
-          "
+          ssh -p ${SSH_PORT:-22} "$SSH_USER@$SSH_HOST" bash -s <<EOF
+            set -e
+            cd $TARGET/app_code
+
+            composer install --no-dev --optimize-autoloader --no-interaction 2>&1 | tail -1
+
+            $PHP artisan migrate --force 2>&1 | tail -2
+            $PHP artisan storage:link 2>/dev/null || true
+            $PHP artisan config:cache 2>&1 | tail -1
+            $PHP artisan route:cache 2>&1 | tail -1
+            $PHP artisan view:cache 2>&1 | tail -1
+
+            # مزامنة نقطة الدخول: public/ → public_html/ (بنية Hostinger)
+            mkdir -p ../public_html
+            cp -a public/. ../public_html/
+            sed -i "s|'/../vendor|'/../app_code/vendor|; s|'/../bootstrap|'/../app_code/bootstrap|" ../public_html/index.php
+            ln -sfn ../app_code/storage/app/public ../public_html/storage
+
+            echo "DEPLOY_DONE ✔"
+          EOF
