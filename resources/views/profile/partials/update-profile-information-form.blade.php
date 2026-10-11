@@ -12,6 +12,21 @@
         @csrf
     </form>
 
+    {{-- شريط الصورة الحالية — نموذج الإزالة خارج نموذج الحفظ --}}
+    @if ($user->avatar)
+        <div class="mt-4 bg-white border border-gray-200 rounded-xl p-3 flex items-center gap-3">
+            <img src="{{ Storage::url($user->avatar) }}" alt="الصورة" class="w-12 h-12 rounded-full object-cover border">
+            <span class="text-xs text-gray-500 flex-1">صورتك الحالية — الرفع الجديد يستبدلها.</span>
+            <form method="POST" action="{{ route('profile.remove-avatar') }}"
+                  onsubmit="return confirm('إزالة الصورة الشخصية وحذف ملفها؟')">
+                @csrf
+                <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                    إزالة الصورة
+                </button>
+            </form>
+        </div>
+    @endif
+
     <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
@@ -59,19 +74,12 @@
         </div>
 
         <div>
-            <x-input-label for="avatar" :value="__('الصورة الشخصية')" />
+            <x-input-label for="avatar" :value="__('صورة شخصية جديدة')" />
             <div class="flex items-center gap-4 mt-1">
                 @if ($user->avatar)
-                    <img src="{{ Storage::url($user->avatar) }}" alt="الصورة" class="w-14 h-14 rounded-full object-cover border">
-                    <form method="POST" action="{{ route('profile.remove-avatar') }}"
-                          onsubmit="return confirm('إزالة الصورة الشخصية وحذف ملفها؟')">
-                        @csrf
-                        <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
-                            إزالة الصورة
-                        </button>
-                    </form>
+                    <span class="text-[11px] text-gray-500">الحالية في الشريط أعلى النموذج.</span>
                 @else
-                    <span class="w-14 h-14 rounded-full bg-red-100 text-red-800 flex items-center justify-center font-bold text-xl">{{ mb_substr(($user->display_name ?: $user->name), 0, 1) }}</span>
+                    <span class="w-14 h-14 rounded-full bg-brand-soft text-brand flex items-center justify-center font-bold text-xl">{{ mb_substr(($user->display_name ?: $user->name), 0, 1) }}</span>
                 @endif
                 <input type="file" name="avatar" id="avatar" accept=".jpg,.jpeg,.png,.webp"
                        class="flex-1 text-xs border border-gray-300 rounded file:me-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">

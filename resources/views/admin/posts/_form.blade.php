@@ -15,6 +15,21 @@
     </form>
 </div>
 
+{{-- شريط الصورة الحالية — نموذج الإزالة خارج نموذج الحفظ --}}
+@if (isset($post) && $post->featured_image)
+    <div class="lg:col-span-2 bg-white rounded-xl shadow p-4 flex flex-wrap items-center gap-3">
+        <img src="{{ Storage::url($post->featured_image) }}" alt="" class="h-10 rounded border">
+        <span class="text-xs text-gray-500 flex-1">الصورة الرئيسية الحالية — الرفع الجديد يستبدلها (وتُحفظ القديمة في المكتبة).</span>
+        <form method="POST" action="{{ route('admin.posts.remove-image', $post) }}"
+              onsubmit="return confirm('إزالة الصورة الرئيسية وحذف ملفها نهائيًا؟')">
+            @csrf
+            <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                إزالة الصورة الرئيسية
+            </button>
+        </form>
+    </div>
+@endif
+
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
     @csrf
     @if (isset($post))
@@ -167,13 +182,7 @@
             <h3 class="font-bold border-b border-gray-200 pb-3">الصورة الرئيسية</h3>
             @if (isset($post) && $post->featured_image)
                 <img src="{{ Storage::url($post->featured_image) }}" alt="" class="rounded-lg w-full">
-                <form method="POST" action="{{ route('admin.posts.remove-image', $post) }}"
-                      onsubmit="return confirm('إزالة الصورة الرئيسية وحذف ملفها؟')">
-                    @csrf
-                    <button class="w-full text-red-700 border border-red-200 rounded-lg py-2 text-xs font-semibold hover:bg-red-50">
-                        إزالة الصورة الرئيسية
-                    </button>
-                </form>
+                <p class="text-[11px] text-gray-500">للإزالة: استخدم زر «إزالة الصورة الرئيسية» في شريط الأعلى.</p>
             @endif
             <input type="file" name="featured_image" accept=".jpg,.jpeg,.png,.webp,.gif"
                    class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">

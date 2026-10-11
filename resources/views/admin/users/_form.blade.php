@@ -1,6 +1,21 @@
 {{-- نموذج مستخدم جديد/تعديل — المتغيرات: editingUser (اختياري) ، roles --}}
 @php $editing = isset($editingUser); @endphp
 
+{{-- شريط إزالة الصورة الحالية — خارج نموذج الحفظ --}}
+@if ($editing && $editingUser->avatar)
+    <div class="mb-4 bg-white rounded-xl shadow p-4 flex items-center gap-3">
+        <img src="{{ \Illuminate\Support\Facades\Storage::url($editingUser->avatar) }}" alt="" class="w-12 h-12 rounded-full object-cover border">
+        <span class="text-xs text-gray-500 flex-1">الصورة الحالية — الرفع الجديد يستبدلها.</span>
+        <form method="POST" action="{{ route('admin.users.remove-avatar', $editingUser) }}"
+              onsubmit="return confirm('إزالة صورة المستخدم وحذف ملفها؟')">
+            @csrf
+            <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                إزالة الصورة
+            </button>
+        </form>
+    </div>
+@endif
+
 <form method="POST" action="{{ $editing ? route('admin.users.update', $editingUser) : route('admin.users.store') }}" class="max-w-2xl space-y-5">
     @csrf
     @if ($editing) @method('PUT') @endif
@@ -59,18 +74,9 @@
         </div>
 
         <div>
-            <label class="block text-sm font-bold mb-1.5">الصورة الشخصية</label>
+            <label class="block text-sm font-bold mb-1.5">صورة شخصية جديدة</label>
             @if ($editing && $editingUser->avatar)
-                <div class="flex items-center gap-3 mb-2">
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($editingUser->avatar) }}" alt="" class="w-14 h-14 rounded-full object-cover border">
-                    <form method="POST" action="{{ route('admin.users.remove-avatar', $editingUser) }}"
-                          onsubmit="return confirm('إزالة صورة المستخدم وحذف ملفها؟')">
-                        @csrf
-                        <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
-                            إزالة الصورة
-                        </button>
-                    </form>
-                </div>
+                <p class="text-[11px] text-gray-500 mb-1.5">الحالية معروضة في الشريط أعلى النموذج.</p>
             @endif
             <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.webp"
                    class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">

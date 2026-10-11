@@ -43,7 +43,7 @@ class SettingsPageTest extends TestCase
         $response = $this->actingAs($user)->get(route('profile.edit'));
 
         $response->assertOk();
-        $response->assertSee('الصورة الشخصية');
+        $response->assertSee('صورة شخصية جديدة');
     }
 
     public function test_admin_cannot_delete_last_admin(): void

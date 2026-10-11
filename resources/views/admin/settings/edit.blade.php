@@ -4,7 +4,40 @@
     </x-slot>
 
     <div class="py-8 max-w-4xl mx-auto sm:px-6 lg:px-8">
-        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="space-y-5">
+        {{-- شريط الهوية الحالية — نماذج الإزالة خارج نموذج الحفظ (التداخل يفسد DOM) --}}
+        @if ($settings['site_logo'] || $settings['site_favicon'])
+            <div class="bg-white rounded-xl shadow p-5 mb-5 flex flex-wrap items-center gap-4">
+                <span class="text-xs font-black text-gray-400">الهوية الحالية:</span>
+                @if ($settings['site_logo'])
+                    <div class="flex items-center gap-2">
+                        <img src="{{ Storage::url($settings['site_logo']) }}" alt="اللوجو" class="h-10 object-contain rounded border p-1 bg-white">
+                        <form method="POST" action="{{ route('admin.settings.remove-logo') }}"
+                              onsubmit="return confirm('إزالة اللوجو وحذف ملفه نهائيًا؟')">
+                            @csrf
+                            <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                                إزالة اللوجو
+                            </button>
+                        </form>
+                    </div>
+                @endif
+                @if ($settings['site_favicon'])
+                    <div class="flex items-center gap-2">
+                        <img src="{{ Storage::url($settings['site_favicon']) }}" alt="الفيكون" class="h-9 w-9 object-contain rounded border p-1 bg-white">
+                        <form method="POST" action="{{ route('admin.settings.remove-favicon') }}"
+                              onsubmit="return confirm('إزالة الأيقونة وحذف ملفها نهائيًا؟')">
+                            @csrf
+                            <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                                إزالة الأيقونة
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data"
+              onsubmit="return confirm('تأكيد حفظ الإعدادات الجديدة؟')"
+              class="space-y-5">
             @csrf
             @method('PUT')
 
@@ -44,15 +77,8 @@
                         @if ($settings['site_logo'])
                             <div class="flex items-center gap-3">
                                 <img src="{{ Storage::url($settings['site_logo']) }}" alt="اللوجو الحالي" class="h-12 object-contain rounded border p-1 bg-white">
-                                <form method="POST" action="{{ route('admin.settings.remove-logo') }}"
-                                      onsubmit="return confirm('إزالة اللوجو وحذف ملفه نهائيًا؟ سيظهر اسم الموقع نصيًا.')">
-                                    @csrf
-                                    <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
-                                        إزالة اللوجو
-                                    </button>
-                                </form>
+                                <span class="text-[11px] text-gray-500">الرفع الجديد يستبدله — أو أزله من الشريط أعلى الصفحة.</span>
                             </div>
-                            <span class="text-[11px] text-gray-500">رفع ملف جديد يستبدلهHub.</span>
                         @else
                             <p class="text-xs text-gray-500">لا يوجد لوجو — سيظهر اسم الموقع نصيًا.</p>
                         @endif
@@ -65,13 +91,7 @@
                         @if ($settings['site_favicon'])
                             <div class="flex items-center gap-3">
                                 <img src="{{ Storage::url($settings['site_favicon']) }}" alt="الفيكون" class="h-10 w-10 object-contain rounded border p-1 bg-white">
-                                <form method="POST" action="{{ route('admin.settings.remove-favicon') }}"
-                                      onsubmit="return confirm('إزالة الأيقونة وحذف ملفها نهائيًا؟')">
-                                    @csrf
-                                    <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
-                                        إزالة الأيقونة
-                                    </button>
-                                </form>
+                                <span class="text-[11px] text-gray-500">الرفع الجديد يستبدله — أو أزله من الشريط أعلى الصفحة.</span>
                             </div>
                         @else
                             <p class="text-xs text-gray-500">لا توجد أيقونة مخصصة.</p>
