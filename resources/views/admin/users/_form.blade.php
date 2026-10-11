@@ -61,7 +61,16 @@
         <div>
             <label class="block text-sm font-bold mb-1.5">الصورة الشخصية</label>
             @if ($editing && $editingUser->avatar)
-                <img src="{{ \Illuminate\Support\Facades\Storage::url($editingUser->avatar) }}" alt="" class="w-14 h-14 rounded-full object-cover border mb-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($editingUser->avatar) }}" alt="" class="w-14 h-14 rounded-full object-cover border">
+                    <form method="POST" action="{{ route('admin.users.remove-avatar', $editingUser) }}"
+                          onsubmit="return confirm('إزالة صورة المستخدم وحذف ملفها؟')">
+                        @csrf
+                        <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                            إزالة الصورة
+                        </button>
+                    </form>
+                </div>
             @endif
             <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.webp"
                    class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">

@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/remove-avatar', [ProfileController::class, 'removeAvatar'])->name('profile.remove-avatar');
 });
 
 /*
@@ -120,6 +121,7 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
             Route::post('users', [UserController::class, 'store'])->name('users.store');
             Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+            Route::post('users/{user}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.remove-avatar');
             Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         });
 

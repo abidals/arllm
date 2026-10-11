@@ -44,7 +44,7 @@
                         @if ($settings['site_logo'])
                             <div class="flex items-center gap-3">
                                 <img src="{{ Storage::url($settings['site_logo']) }}" alt="اللوجو الحالي" class="h-12 object-contain rounded border p-1 bg-white">
-                                <form method="POST" action="{{ route('settings.remove-logo') }}"
+                                <form method="POST" action="{{ route('admin.settings.remove-logo') }}"
                                       onsubmit="return confirm('إزالة اللوجو وحذف ملفه نهائيًا؟ سيظهر اسم الموقع نصيًا.')">
                                     @csrf
                                     <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
@@ -65,7 +65,7 @@
                         @if ($settings['site_favicon'])
                             <div class="flex items-center gap-3">
                                 <img src="{{ Storage::url($settings['site_favicon']) }}" alt="الفيكون" class="h-10 w-10 object-contain rounded border p-1 bg-white">
-                                <form method="POST" action="{{ route('settings.remove-favicon') }}"
+                                <form method="POST" action="{{ route('admin.settings.remove-favicon') }}"
                                       onsubmit="return confirm('إزالة الأيقونة وحذف ملفها نهائيًا؟')">
                                     @csrf
                                     <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">

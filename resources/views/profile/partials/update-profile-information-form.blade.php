@@ -63,6 +63,13 @@
             <div class="flex items-center gap-4 mt-1">
                 @if ($user->avatar)
                     <img src="{{ Storage::url($user->avatar) }}" alt="الصورة" class="w-14 h-14 rounded-full object-cover border">
+                    <form method="POST" action="{{ route('profile.remove-avatar') }}"
+                          onsubmit="return confirm('إزالة الصورة الشخصية وحذف ملفها؟')">
+                        @csrf
+                        <button class="text-xs text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                            إزالة الصورة
+                        </button>
+                    </form>
                 @else
                     <span class="w-14 h-14 rounded-full bg-red-100 text-red-800 flex items-center justify-center font-bold text-xl">{{ mb_substr(($user->display_name ?: $user->name), 0, 1) }}</span>
                 @endif

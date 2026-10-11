@@ -62,6 +62,23 @@ class ProfileController extends Controller
     }
 
     /**
+     * Remove the user's avatar.
+     */
+    public function removeAvatar(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            \App\Models\Media::where('path', $user->avatar)->delete();
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'تمت إزالة الصورة الشخصية.');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

@@ -95,6 +95,18 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('status', 'تم تحديث المستخدم.');
     }
 
+    public function removeAvatar(User $user)
+    {
+        if ($user->avatar) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            \App\Models\Media::where('path', $user->avatar)->delete();
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return back()->with('status', 'تمت إزالة الصورة الشخصية للمستخدم.');
+    }
+
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
