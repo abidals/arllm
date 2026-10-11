@@ -32,7 +32,7 @@ class SettingsPageTest extends TestCase
         $response = $this->actingAs($this->adminUser())->get(route('admin.settings.edit'));
 
         $response->assertOk();
-        $response->assertSee('عناوين الصفحة الرئيسية');
+        $response->assertSee('عنوان التدفق الرئيسي');
         $response->assertSee('موقع قائمة الأقسام');
     }
 
