@@ -69,13 +69,35 @@ class MediaController extends Controller
         if ($usage->isNotEmpty()) {
             $names = $usage->pluck('label')->implode('، ');
 
-            return back()->withErrors(['error' => 'الملف مرتبط بـ: '.$names.' — استبدله أولاً أو أزل الاستخدام ثم احذف.']);
+            return back()->withErrors(['error' => 'الملف مرتبط بـ: '.$names.' — استبدل الاستخدام أولًا، أو استخدم «حذف قسري» الذي يفرّغ كل الاستخدامات ثم يحذف الملف.']);
         }
 
         Storage::disk('public')->delete($media->path);
         $media->delete();
 
         return back()->with('status', 'تم حذف الملف نهائيًا.');
+    }
+
+    /**
+     * حذف قسري: يفرّغ كل الاستخدامات (مقالات، صور شخصية، إعدادات) ثم يحذف الملف.
+     */
+    public function forceDestroy(MediaAsset $media)
+    {
+        $path = $media->path;
+
+        Post::withTrashed()->where('featured_image', $path)->update(['featured_image' => null]);
+        User::where('avatar', $path)->update(['avatar' => null]);
+
+        foreach (['site_logo', 'site_favicon', 'heading_font_path', 'body_font_path'] as $key) {
+            if ((string) Setting::get($key) === $path) {
+                Setting::set($key, null);
+            }
+        }
+
+        Storage::disk('public')->delete($path);
+        $media->delete();
+
+        return back()->with('status', 'تم الحذف القسري مع تفريغ جميع مراجع الاستخدام.');
     }
 
     public function rename(Request $request, MediaAsset $media)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -63,6 +64,11 @@ class SettingController extends Controller
                 // الصفحة الرئيسية
                 'hero_count' => Setting::get('hero_count', '1'),
 
+                // عناوين الصفحة الرئيسية (قابلة لإعادة التسمية)
+                'home_title_latest' => Setting::get('home_title_latest', 'أجدد القصص'),
+                'home_title_featured' => Setting::get('home_title_featured', 'مميزة اليوم'),
+                'home_title_most_read' => Setting::get('home_title_most_read', 'الأكثر قراءة'),
+
                 // الهوية البصرية
                 'site_logo' => Setting::get('site_logo'),
                 'site_favicon' => Setting::get('site_favicon'),
@@ -113,6 +119,10 @@ class SettingController extends Controller
             'featured_strip_count' => ['nullable', 'integer', 'between:0,6'],
             'hero_count' => ['nullable', 'integer', 'between:1,3'],
 
+            'home_title_latest' => ['nullable', 'string', 'max:60'],
+            'home_title_featured' => ['nullable', 'string', 'max:60'],
+            'home_title_most_read' => ['nullable', 'string', 'max:60'],
+
             'font_heading_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
             'font_body_family' => ['nullable', Rule::in(array_keys(self::GOOGLE_ARABIC_FONTS))],
 
@@ -148,6 +158,12 @@ class SettingController extends Controller
             }
         }
 
+        foreach (['home_title_latest', 'home_title_featured', 'home_title_most_read'] as $titleKey) {
+            if (isset($data[$titleKey]) && trim($data[$titleKey]) !== '') {
+                Setting::set($titleKey, strip_tags(trim($data[$titleKey])));
+            }
+        }
+
         // ==================================================================
         // رفع الملفات (لوجو/فيكون/خطوط) — تحقق + تنقية + تخزين آمن
         // ==================================================================
@@ -166,9 +182,12 @@ class SettingController extends Controller
             // حذف القديم
             if ($old = Setting::get('site_logo')) {
                 Storage::disk('public')->delete($old);
+                Media::where('path', $old)->delete();
             }
 
             Setting::set('site_logo', 'brand/'.$name);
+
+            $this->registerMedia($file, 'brand/'.$name);
         }
 
         if ($request->hasFile('site_favicon')) {
@@ -183,9 +202,12 @@ class SettingController extends Controller
 
             if ($old = Setting::get('site_favicon')) {
                 Storage::disk('public')->delete($old);
+                Media::where('path', $old)->delete();
             }
 
             Setting::set('site_favicon', 'brand/'.$name);
+
+            $this->registerMedia($file, 'brand/'.$name);
         }
 
         foreach (['heading_font_file' => 'heading_font_path', 'body_font_file' => 'body_font_path'] as $fileKey => $pathKey) {
@@ -196,13 +218,56 @@ class SettingController extends Controller
 
                 if ($old = Setting::get($pathKey)) {
                     Storage::disk('public')->delete($old);
+                    Media::where('path', $old)->delete();
                 }
 
                 Setting::set($pathKey, 'fonts/'.$name);
+
+                $this->registerMedia($file, 'fonts/'.$name);
             }
         }
 
         return back()->with('status', 'تم حفظ الإعدادات.');
+    }
+
+    /** تسجيل أي ملف مرفوع في مكتبة الوسائط */
+    private function registerMedia($file, string $path): void
+    {
+        try {
+            Media::create([
+                'user_id' => auth()->id(),
+                'path' => $path,
+                'original_name' => mb_substr(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME), 0, 100),
+                'mime_type' => strtolower($file->getMimeType() ?? ''),
+                'size' => Storage::disk('public')->size($path),
+            ]);
+        } catch (\Throwable) {
+            // تسجيل الوسائط اختياري — لا يعطل الحفظ
+        }
+    }
+
+    /** إزالة اللوجو نهائيًا (ملف + سجل) */
+    public function removeLogo()
+    {
+        if ($old = Setting::get('site_logo')) {
+            Storage::disk('public')->delete($old);
+            Media::where('path', $old)->delete();
+            Setting::set('site_logo', null);
+        }
+
+        return back()->with('status', 'تمت إزالة اللوجو — الموقع سيعرض الاسم نصيًا.');
+    }
+
+    /** إزالة الأيقونة نهائيًا */
+    public function removeFavicon()
+    {
+        if ($old = Setting::get('site_favicon')) {
+            Storage::disk('public')->delete($old);
+            Media::where('path', $old)->delete();
+            Setting::set('site_favicon', null);
+        }
+
+        return back()->with('status', 'تمت إزالة الأيقونة.');
     }
 
     /** تنقية SVG: إزالة الأسكربتات والأحداث والروابط الخطرة */

@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', site_name())</title>
+    @php
+        $siteTagline = \App\Models\Setting::get('site_tagline', '');
+        $tabTitle = View::hasSection('title')
+            ? View::getSection('title')
+            : site_name().($siteTagline !== '' ? ' | '.\Illuminate\Support\Str::limit($siteTagline, 45) : '');
+    @endphp
+
+    <title>{{ $tabTitle }}</title>
     <meta name="description" content="@yield('meta_description', \Illuminate\Support\Str::limit(\App\Models\Setting::get('site_description', 'صحافة رقمية عربية'), 160))">
     <link rel="canonical" content="@yield('canonical', url()->current())">
     <meta property="og:title" content="@yield('og_title', config('app.name'))">
@@ -93,13 +100,16 @@
     <header class="bg-white border-b border-gray-200 z-50 shadow-sm {{ \App\Models\Setting::get('header_sticky', '1') === '1' ? 'sticky top-0' : '' }}">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between py-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-3">
+                <a href="{{ route('home') }}" class="flex flex-col justify-center min-w-0">
                     @if ($logo = \App\Models\Setting::get('site_logo'))
                         <img src="{{ Storage::url($logo) }}" alt="{{ site_name() }}" class="h-10 sm:h-12 w-auto object-contain">
                     @else
-                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-950">
+                        <span class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-950 leading-none">
                             {{ site_name() }}
-                        </h1>
+                        </span>
+                    @endif
+                    @if ($siteTagline !== '')
+                        <span class="text-[11px] sm:text-xs text-gray-500 font-medium mt-1.5">{{ $siteTagline }}</span>
                     @endif
                 </a>
 
@@ -124,13 +134,10 @@
                                 @endif
                             </a>
 
-                            @if ($section['has_children'])
-                                <div class="nav-sub" role="menu">
-                                    <a href="{{ route('site.category', $section['slug']) }}" class="block px-4 py-2 text-sm font-bold text-gray-900 hover:bg-red-50 hover:text-brand" role="menuitem">
-                                        {{ $section['name'] }} — الكل
-                                    </a>
+@if ($section['has_children'])
+                                <div class="nav-sub" role="menu" dir="rtl">
                                     @foreach ($section['children'] as $child)
-                                        <a href="{{ route('site.category', $child['slug']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-brand" role="menuitem">
+                                        <a href="{{ route('site.category', $child['slug']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700" role="menuitem">
                                             {{ $child['name'] }}
                                         </a>
                                     @endforeach

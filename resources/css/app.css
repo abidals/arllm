@@ -128,6 +128,8 @@ body {
     right: 0;
     min-width: 180px;
     z-index: 50;
+    direction: rtl;
+    text-align: right;
     @apply bg-white rounded-lg shadow-xl border border-gray-100 py-2;
 }
 

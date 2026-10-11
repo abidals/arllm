@@ -70,7 +70,7 @@
     @if ($featuredStrip->isNotEmpty())
         <section class="mb-10">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1">مميزة اليوم</h3>
+                <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1">{{ \App\Models\Setting::get('home_title_featured', 'مميزة اليوم') }}</h3>
                 <a href="{{ route('site.issue') }}" class="text-sm font-semibold text-brand hover:underline">العدد الكامل ←</a>
             </div>
             <div class="grid sm:grid-cols-3 gap-5">
@@ -84,7 +84,7 @@
     <div class="grid lg:grid-cols-[1fr_300px] gap-10">
         {{-- التدفق الرئيسي --}}
         <section>
-            <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1 mb-6">أجدد القصص</h3>
+            <h3 class="text-xl font-bold border-b-4 border-brand inline-block pb-1 mb-6">{{ \App\Models\Setting::get('home_title_latest', 'أجدد القصص') }}</h3>
             <div class="grid sm:grid-cols-2 gap-6">
                 @forelse ($posts as $post)
                     @include('site.partials.post-card', ['post' => $post, 'showCategory' => true])
@@ -114,7 +114,7 @@
         {{-- الشريط الجانبي --}}
         <aside class="space-y-8 lg:sticky lg:top-32 self-start">
             <div class="bg-white rounded-xl border border-gray-200 p-5">
-                <h3 class="text-lg font-bold border-b-2 border-gray-900 inline-block pb-1 mb-3">الأكثر قراءة</h3>
+                <h3 class="text-lg font-bold border-b-2 border-gray-900 inline-block pb-1 mb-3">{{ \App\Models\Setting::get('home_title_most_read', 'الأكثر قراءة') }}</h3>
                 <ol>
                     @forelse ($mostRead as $post)
                         @include('site.partials.most-read-item', ['post' => $post])

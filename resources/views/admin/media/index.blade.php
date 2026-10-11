@@ -77,12 +77,21 @@
                         </form>
 
                         {{-- حذف --}}
-                        <form method="POST" action="{{ route('admin.media.destroy', $asset) }}"
-                              onsubmit="return confirm('حذف الملف نهائيًا من المكتبة؟')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="text-[11px] text-red-700 border border-red-200 rounded px-2 py-1.5 font-semibold hover:bg-red-50">حذف</button>
-                        </form>
+                        @if ($asset->usage->isNotEmpty())
+                            <form method="POST" action="{{ route('admin.media.force-destroy', $asset) }}"
+                                  onsubmit="return confirm('حذف قسري؟ ستُزال الصورة من: {{ $asset->usage->pluck('label')->implode(' / ') }} — لا يتراجع.')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="text-[11px] text-red-700 border border-red-200 rounded px-2 py-1.5 font-semibold hover:bg-red-50 w-20">حذف قسري</button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('admin.media.destroy', $asset) }}"
+                                  onsubmit="return confirm('حذف الملف نهائيًا من المكتبة؟')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="text-[11px] text-red-700 border border-red-200 rounded px-2 py-1.5 font-semibold hover:bg-red-50 w-20">حذف</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             @empty

@@ -76,6 +76,7 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
         Route::get('media', [MediaController::class, 'index'])->name('media.index');
         Route::post('media', [MediaController::class, 'store'])->name('media.store');
         Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+        Route::post('media/{media}/force-destroy', [MediaController::class, 'forceDestroy'])->name('media.force-destroy');
         Route::post('media/{media}/rename', [MediaController::class, 'rename'])->name('media.rename');
         Route::post('media/{media}/replace', [MediaController::class, 'replace'])->name('media.replace');
 
@@ -126,6 +127,8 @@ Route::middleware(['auth', 'can:access-dashboard', 'throttle:admin'])
         Route::middleware('can:manage-settings')->group(function () {
             Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::post('settings/remove-logo', [SettingController::class, 'removeLogo'])->name('settings.remove-logo');
+            Route::post('settings/remove-favicon', [SettingController::class, 'removeFavicon'])->name('settings.remove-favicon');
         });
     });
 

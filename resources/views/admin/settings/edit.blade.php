@@ -42,21 +42,43 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-bold">لوجو الموقع</label>
                         @if ($settings['site_logo'])
-                            <img src="{{ Storage::url($settings['site_logo']) }}" alt="اللوجو الحالي" class="h-12 object-contain rounded border p-1 bg-white">
-                            <span class="text-[11px] text-gray-500 block">رفع ملف جديد يستبدله.</span>
+                            <div class="flex items-center gap-3">
+                                <img src="{{ Storage::url($settings['site_logo']) }}" alt="اللوجو الحالي" class="h-12 object-contain rounded border p-1 bg-white">
+                                <form method="POST" action="{{ route('settings.remove-logo') }}"
+                                      onsubmit="return confirm('إزالة اللوجو وحذف ملفه نهائيًا؟ سيظهر اسم الموقع نصيًا.')">
+                                    @csrf
+                                    <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                                        إزالة اللوجو
+                                    </button>
+                                </form>
+                            </div>
+                            <span class="text-[11px] text-gray-500">رفع ملف جديد يستبدلهHub.</span>
+                        @else
+                            <p class="text-xs text-gray-500">لا يوجد لوجو — سيظهر اسم الموقع نصيًا.</p>
                         @endif
                         <input type="file" name="site_logo" accept=".png,.svg,.jpg,.webp"
                                class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">
-                        <p class="text-xs text-gray-500">PNG / SVG / JPG / WebP — حتى 1MB. يُستخدم في رأس الموقع.</p>
+                        <p class="text-[11px] text-gray-500">PNG / SVG / JPG / WebP — حتى 1MB. يُسجّل أيضًا في مكتبة الوسائط.</p>
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-bold">أيقونة المتصفح (Favicon)</label>
                         @if ($settings['site_favicon'])
-                            <img src="{{ Storage::url($settings['site_favicon']) }}" alt="الفيكون" class="h-10 w-10 object-contain rounded border p-1 bg-white">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ Storage::url($settings['site_favicon']) }}" alt="الفيكون" class="h-10 w-10 object-contain rounded border p-1 bg-white">
+                                <form method="POST" action="{{ route('settings.remove-favicon') }}"
+                                      onsubmit="return confirm('إزالة الأيقونة وحذف ملفها نهائيًا؟')">
+                                    @csrf
+                                    <button class="text-[11px] text-red-700 border border-red-200 rounded px-3 py-1.5 font-semibold hover:bg-red-50">
+                                        إزالة الأيقونة
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <p class="text-xs text-gray-500">لا توجد أيقونة مخصصة.</p>
                         @endif
                         <input type="file" name="site_favicon" accept=".png,.ico,.svg"
                                class="block w-full text-xs border border-gray-300 rounded file:me-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gray-900 file:text-white">
-                        <p class="text-xs text-gray-500">PNG / ICO / SVG — حتى 512KB.</p>
+                        <p class="text-[11px] text-gray-500">PNG / ICO / SVG — حتى 512KB.</p>
                     </div>
                 </div>
             </div>
@@ -92,6 +114,20 @@
                         <label class="block text-sm font-bold mb-1.5">عدد مقالات الهيرو الرئيسية</label>
                         <input name="hero_count" type="number" min="1" max="3" value="{{ old('hero_count', $settings['hero_count']) }}" class="w-full border-gray-300 rounded-lg">
                         <p class="text-[11px] text-gray-500 mt-1">1 = غلاف كبير فقط · 2-3 = غلاف + بطاقات جانبية.</p>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-3 border-t border-gray-100 pt-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-500 mb-1">عنوان التدفق الرئيسي</label>
+                        <input name="home_title_latest" maxlength="60" value="{{ old('home_title_latest', $settings['home_title_latest']) }}" class="w-full border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-500 mb-1">عنوان الشريط المميز</label>
+                        <input name="home_title_featured" maxlength="60" value="{{ old('home_title_featured', $settings['home_title_featured']) }}" class="w-full border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-500 mb-1">عنوان القائمة الجانبية</label>
+                        <input name="home_title_most_read" maxlength="60" value="{{ old('home_title_most_read', $settings['home_title_most_read']) }}" class="w-full border-gray-300 rounded-lg text-sm">
                     </div>
                 </div>
             </div>
